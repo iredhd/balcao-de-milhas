@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum bid_direction {
+  BUY
+  SELL
+}
+
+model bid {
+  id Int @id @default(autoincrement())
+  created_at DateTime @default(now())
+  offer_id Int @unique
+  amount Int
+  price Decimal
+  company String
+  pax Int
+  cancell_return_percentage Decimal
+  direction bid_direction
+  is_vcm Boolean
+}
+
+model news {
+  id Int @id @default(autoincrement())
+  created_at DateTime @default(now())
+  title String
+  link String
+}
+
+enum log_method {
+  GET
+  PUT
+  POST
+  DELETE
+  PATCH
+  HEAD
+  OPTIONS
+  TRACE
+}
+
+model log {
+  id Int @id @default(autoincrement())
+  created_at DateTime @default(now())
+  ip String
+  url String
+  headers Json
+  body Json
+  method log_method
+}
