@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "license": "MIT",
   "private": true,
-  "workspaces": {
-    "packages": ["packages/*"]
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev:app": "yarn workspace @balcao-de-milhas/app run start",
+    "dev:api": "yarn workspace @balcao-de-milhas/api run dev"
   }
 }
