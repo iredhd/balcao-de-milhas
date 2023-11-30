@@ -106,14 +106,14 @@ export default function App() {
                                             <Text style={{marginRight: 2}}>{formatNumber(item.recommendations)}</Text><MaterialCommunityIcons name='thumb-up' />
                                             <Text style={{marginRight: 2, marginLeft: 5}}>{formatNumber(item.claims)}</Text><MaterialCommunityIcons name='thumb-down' />
                                         </View>
-                                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                        {item.is_mastermiles && (<View style={{flexDirection: 'row', alignItems: 'center'}}>
                                             <MaterialCommunityIcons name='star' style={{marginRight: 2}}  />
                                             <Text style={{fontStyle: 'italic', fontSize: 12}}>Membro Mastermiles</Text>
-                                        </View>
-                                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                        </View>)}
+                                        {item.is_mentoria && (<View style={{flexDirection: 'row', alignItems: 'center'}}>
                                             <MaterialCommunityIcons name='star' style={{marginRight: 2}}  />
                                             <Text style={{fontStyle: 'italic', fontSize: 12}}>Mentorado</Text>
-                                        </View>
+                                        </View>)}
                                         <View style={{flexDirection: 'row', alignItems: 'center'}}>
                                             <Text style={{fontStyle: 'italic', fontSize: 12}}>Membro desde {formatDate(item.member_since)}</Text>
                                         </View>
