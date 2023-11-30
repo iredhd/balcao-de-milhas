@@ -9,11 +9,12 @@ const app = express()
 
 config()
 
+
 app.set('trust proxy', true)
 app.use(morgan('tiny'));
-app.use(cors());
 app.use(express.json());
 app.use(logMiddleware)
+app.use(cors());
 
 app.get('/', (_, res) => {
   return res.status(200).json({
