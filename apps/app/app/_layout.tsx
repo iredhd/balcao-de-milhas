@@ -1,11 +1,18 @@
 import { Tabs } from 'expo-router/tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { ThemeProvider, DarkTheme, DefaultTheme, useTheme } from '@react-navigation/native';
+import { ThemeProvider, DarkTheme, useTheme } from '@react-navigation/native';
 import Toast from 'react-native-toast-message'
+import {Provider, DefaultTheme, ThemeProvider as RNThemeProvider} from 'react-native-paper'
   
 export default function Layout() {
   return (
-      <>
+      <Provider theme={{
+          ...DefaultTheme,
+          colors: {
+              ...DefaultTheme.colors,
+              primary: '#55bf0a'
+          }
+      }}>
         <Toast autoHide position='top' />
         <ThemeProvider value={{
             ...DarkTheme,
@@ -47,6 +54,6 @@ export default function Layout() {
                 />
             </Tabs>
         </ThemeProvider>
-    </>
+    </Provider>
   );
 }

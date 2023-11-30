@@ -2,14 +2,15 @@ import { Link } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Fragment, useState } from 'react';
 import { FlatList, ImageBackground, ImageSourcePropType, StyleSheet, View } from 'react-native';
-import {Card, Text, ActivityIndicator} from '../../components'
+import {Card, Text, ActivityIndicator, FAB, Portal, Dialog, TextInput, Button, Switch, Dropdown } from '../../components'
 import {formatDate, formatDateTime, formatMoney, formatNumber, PROGRAMS } from '@balcao-de-milhas/utils'
 import { Avatar, IconButton } from 'react-native-paper';
 import Toast from 'react-native-toast-message'
-import { useAPI } from '../../hooks';
+import { useAPI, useToggle } from '../../hooks';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
 import Fuse from 'fuse.js'
+import {Formik} from 'formik'
 
 const fuse = new Fuse(PROGRAMS, {
     minMatchCharLength: 2,
@@ -28,6 +29,7 @@ const fuse = new Fuse(PROGRAMS, {
 
 export default function App() {
     const theme = useTheme()
+    const [filterModalVisibility, filterModalVisibilityControls] = useToggle(false)
     
     const [bids, refetchBids] = useAPI({
         url: '/bid',
@@ -36,8 +38,116 @@ export default function App() {
         }
     })
 
+
+    const [filters, setFilters] = useState({
+        amount: {
+            condition: '',
+            value: ''
+        },
+        pax: {
+            condition: '',
+            value: ''
+        },
+        price: {
+            condition: '',
+            value: ''
+        },
+        company: {
+            condition: '',
+            value: ''
+        },
+        is_mastermiles: {
+            condition: '',
+            value: ''
+        },
+        is_mentoria: {
+            condition: '',
+            value: ''
+        },
+    })
+
+
+    console.log('filterModalVisibility', filterModalVisibility)
   return (
     <View style={styles.container}>
+        <Portal>
+          <Dialog visible={filterModalVisibility} onDismiss={filterModalVisibilityControls.setFalse}>
+          <Formik
+                initialValues={{ 
+                    amount: {
+                        condition: '',
+                        value: ''
+                    },
+                    company: {
+                        condition: 'eq',
+                        value: ''
+                    },
+                    is_mastermiles: {
+                        condition: 'eq',
+                        value: false
+                    },
+                    is_mentorado: {
+                        condition: 'eq',
+                        value: false
+                    }
+                }}
+                onSubmit={values => console.log(values)}
+            >
+            {({ handleChange, handleBlur, handleSubmit, values, setFieldValue }) => (
+                <View>
+                <Dialog.Title>Filtros</Dialog.Title>
+                <Dialog.Content>
+                    <View>
+                        {/* <View style={{flexDirection: 'row', alignItems: 'center', backgroundColor: 'red'}}> */}
+                        <Dropdown
+                            label={"Companhia"}
+                            // visible={showDropDown}
+                            // showDropDown={() => setShowDropDown(true)}
+                            // onDismiss={() => setShowDropDown(false)}
+                            value={values.company.value}
+                            onSelection={(a) => {
+                                console.log(a)
+                            }}
+                            options={PROGRAMS.map(item => ({
+                                id: item.id,
+                                value: item.name
+                            }))}
+                        />    
+                        {/* </View> */}
+                        {/* <TextInput
+                            onChangeText={handleChange('email')}
+                            onBlur={handleBlur('email')}
+                            value={values.email}
+                        /> */}
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                            <Text>Membro Mastermiles</Text>
+                            <Switch value={values.is_mastermiles.value} onValueChange={() => {
+                                setFieldValue('is_mastermiles.value', !values.is_mastermiles.value)
+                            }} />
+                        </View>
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                            <Text>Membro Mentoria</Text>
+                            <Switch value={values.is_mentorado.value} onValueChange={() => {
+                                setFieldValue('is_mentorado.value', !values.is_mentorado.value)
+                            }} />
+                        </View>
+                    </View>
+                </Dialog.Content>
+                <Dialog.Actions>
+                <Button mode="contained" onPress={handleSubmit}>
+                    Filtrar
+                </Button>
+                </Dialog.Actions>
+            </View>
+            )}
+            </Formik>
+          </Dialog>
+        </Portal>
+        <FAB
+            icon="filter"
+            style={[styles.fab, {backgroundColor: theme.colors.primary}]}
+            onPress={filterModalVisibilityControls.setTrue}
+        />
         <FlatList 
             data={bids?.data?.items || []}
             style={{
@@ -49,7 +159,6 @@ export default function App() {
                 padding: 5,
             }}
             onRefresh={() => {
-                
                 refetchBids({
                     params: {
                         page: 1
@@ -157,4 +266,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+    zIndex: 2
+  },
+
 });
