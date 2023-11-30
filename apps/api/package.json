@@ -22,7 +22,7 @@
   },
   "scripts": {
     "dev": "npx nodemon src/index.ts --watch 'src/' -e ts",
-    "migrate": "npx prisma deploy",
+    "migrate": "npx prisma migrate deploy",
     "build": "rm -rf ./dist && npx prisma generate && npx tsc"
   }
 }
