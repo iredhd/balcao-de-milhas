@@ -42,8 +42,11 @@ export default function App() {
             data={bids?.data?.items || []}
             style={{
                 width: '100%',
-                padding: 5,
                 backgroundColor: '#292841'
+            }}
+            contentContainerStyle={{
+                minHeight: '100%',
+                padding: 5,
             }}
             onRefresh={() => {
                 
@@ -55,11 +58,23 @@ export default function App() {
             }
             refreshing={bids.loading}
             ItemSeparatorComponent={() => <View style={{height: 10}} />}
-            // ListEmptyComponent={}
+            ListEmptyComponent={
+                () => {
+                    return bids.loading ? <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}><ActivityIndicator color={theme.colors.primary} /></View> : <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}><Text style={{
+                        color: 'white'
+                    }}>Nenhuma oferta encontrada.</Text></View>
+                }
+            }
             indicatorStyle='white'
             onEndReached={() => {
                 console.log('fim')
             }}
+            ListFooterComponentStyle={{
+                display: bids.loading ? 'none' : 'flex',
+                height: 100,
+                justifyContent: 'center'
+            }}
+            ListFooterComponent={(bids?.data?.items || []).length ? () => <ActivityIndicator color={theme.colors.primary} /> : null}
             renderItem={({item }) => {
                 return (
                         <Card style={{height: 180, justifyContent: 'center'}} onPress={() => {
