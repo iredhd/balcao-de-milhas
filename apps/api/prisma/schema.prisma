@@ -26,6 +26,11 @@ model bid {
   cancell_return_percentage Decimal
   direction bid_direction
   is_vcm Boolean
+  recommendations Int @default(0)
+  claims Int @default(0)
+  member_since DateTime @default(now())
+  is_mastermiles Boolean @default(false)
+  is_mentoria Boolean @default(false)
 }
 
 model news {
