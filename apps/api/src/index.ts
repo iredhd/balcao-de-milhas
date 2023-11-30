@@ -21,6 +21,14 @@ app.get('/', (_, res) => {
   }) 
 })
 
+app.post('/webhook/bdm', (req, res) => {
+  return res.status(200).json({})
+})
+
+app.post('/webhook/milha-news', (req, res) => {
+  return res.status(200).json({})
+})
+
 app.use('/bid', bid)
 
 app.listen(process.env.API_PORT, () => console.log(`Server running on port ${process.env.API_PORT}`))
