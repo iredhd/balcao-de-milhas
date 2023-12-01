@@ -28,7 +28,7 @@ API.interceptors.response.use(success => success, (error: AxiosError<{ message?:
 
     return Promise.reject(error)
 })
-console.log(API)
+
 configure({ axios: API, defaultOptions: {
   autoCancel: false
 }})

@@ -11,6 +11,7 @@ export interface DropdownProps {
     onSelection: (selected: {selectedList: Array<{id: string, value: string}>, text: string}) => void
     options: Array<{id: string, value: string}>
     multiselect?: boolean
+    hideSearchBox?: boolean
 }
 
 export const Dropdown = (props: DropdownProps) => {
@@ -19,7 +20,7 @@ export const Dropdown = (props: DropdownProps) => {
     const arrayList = props.options.map(item => ({_id: item.id, value: item.value}))
 
     const selectedArrayList = !props.selected ? [] : arrayList.filter(item => typeof props.selected === "string" ? props.selected === item._id : props.selected.includes(item._id)) 
-    console.log(props.value)
+    
     return (
         <PaperSelect
             {...props}

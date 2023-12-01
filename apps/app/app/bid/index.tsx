@@ -4,7 +4,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { FlatList, ImageBackground, ImageSourcePropType, StyleSheet, View } from 'react-native';
 import {Card, Text, ActivityIndicator, FAB, Portal, Dialog, TextInput, Button, Switch, Dropdown } from '../../components'
 import {formatDate, formatDateTime, formatMoney, formatNumber, PROGRAMS } from '@balcao-de-milhas/utils'
-import { Avatar, IconButton } from 'react-native-paper';
+import { Avatar, IconButton, Snackbar } from 'react-native-paper';
 import Toast from 'react-native-toast-message'
 import { useAPI, useToggle } from '../../hooks';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -12,6 +12,8 @@ import { useTheme } from '@react-navigation/native';
 import Fuse from 'fuse.js'
 import {Formik} from 'formik'
 import {uniqBy} from 'lodash'
+import * as Clipboard from 'expo-clipboard';
+import * as Linking from 'expo-linking';
 
 const fuse = new Fuse(PROGRAMS, {
     minMatchCharLength: 2,
@@ -36,11 +38,27 @@ type Bid = {
     is_mentoria: boolean,
     is_mastermiles: boolean,
     pax: number
+    created_at: Date
+    recommendations: number
+    claims: number,
+    amount: number,
+    member_since: Date
+    cancell_return_percentage: number
+    offer_id: number
+    direction: 'BUY' | 'SELL'
 }
+
+const bidTypes = [
+    {id: 'BUY', value: 'Compra'},
+    {id: 'SELL', value: 'Venda'},
+]
 
 export default function App() {
     const theme = useTheme()
     const [filterModalVisibility, filterModalVisibilityControls] = useToggle(false)
+    const [redirectModalVisibility, redirectModalVisibilityControls] = useToggle(false)
+    const [copySnackbarVisibility, copySnackbarVisibilityControls] = useToggle(false)
+    const [offerId, setOfferId] = useState('')
     
     const [bidList, setBidList] = useState<Bid[]>([])
 
@@ -66,6 +84,10 @@ export default function App() {
         //     condition: '',
         //     value: ''
         // },
+        direction: {
+            condition: 'eq',
+            value: ''
+        },
         company: {
             condition: 'eq',
             value: ''
@@ -94,7 +116,7 @@ export default function App() {
             })
         }
     }, [bids?.data?.items])
-
+    
   return (
     <View style={styles.container}>
         <Portal>
@@ -134,6 +156,16 @@ export default function App() {
                                 value: item.name
                             }))}
                         />    
+                        <Dropdown
+                            label={"Tipo de Oferta"}
+                            value={bidTypes.find(item => item.id === values.direction.value)?.value || ''}
+                            onSelection={({ selectedList: [value] }) => {
+                                setFieldValue('direction.value', value?.id || '')
+                            }}
+                            hideSearchBox
+                            selected={values.direction.value}
+                            options={bidTypes}
+                        /> 
                         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 10}}>
                             <Text>Membro Mastermiles</Text>
                             <Switch trackColor={theme.colors.primary} value={values.is_mastermiles.value} onValueChange={() => {
@@ -158,6 +190,50 @@ export default function App() {
             </Formik>
           </Dialog>
         </Portal>
+        <Portal>
+          <Dialog visible={redirectModalVisibility} onDismiss={redirectModalVisibilityControls.setFalse}>
+            <Snackbar
+                visible={copySnackbarVisibility}
+                onDismiss={copySnackbarVisibilityControls.setFalse}
+                shouldRasterizeIOS
+                style={{
+                    position: 'absolute'
+                }}
+                >
+                Código copiado com sucesso!
+            </Snackbar>
+            <Dialog.Title>Atenção!</Dialog.Title>
+            <Dialog.Content>
+                <View>
+                    <Text>
+                        Copie o código da oferta abaixo. Em seguida, clique em "Acessar Oferta" para iniciar a negociação.
+                    </Text>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginVertical: 10}}>
+                    <Text style={{
+                        fontWeight: 'bold',
+                        fontSize: 20
+                    }}> 
+                        {offerId}
+                    </Text>
+                    <IconButton icon="content-copy" onPress={() => {
+                        Clipboard.setStringAsync(offerId)
+                        copySnackbarVisibilityControls.setTrue()
+                    }} />
+                </View>
+            </Dialog.Content>
+            <Dialog.Actions style={{justifyContent: 'center'}}>
+                <Button mode="contained" 
+                    onPress={() => {
+                        Linking.openURL('https://t.me/BDMQUEROVENDERBOT');
+                    }} 
+                    style={{justifyContent: 'center', alignItems: 'center'}}
+                >
+                    Acessar Oferta
+                </Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
         <FAB
             icon={hasFilters ? "filter-check" : "filter"}
             style={[styles.fab, {backgroundColor: theme.colors.primary}]}
@@ -175,6 +251,7 @@ export default function App() {
             }}
             onRefresh={() => {
                 setPage(1)
+                setBidList([])
                 refetchBids({
                     params: {
                         page: 1,
@@ -182,7 +259,7 @@ export default function App() {
                     }
                 })}
             }
-            refreshing={bids.loading && !!bidList.length}
+            refreshing={false}
             ItemSeparatorComponent={() => <View style={{height: 10}} />}
             ListEmptyComponent={
                 () => {
@@ -215,11 +292,10 @@ export default function App() {
             renderItem={({item }) => {
                 return (
                         <Card style={{height: 180, justifyContent: 'center'}} onPress={() => {
-                            Toast.show({
-                                type: 'success',
-                                text1: 'Teste!',
-                                text2: 'Testando...'
-                            })
+                            setOfferId(`${item.offer_id}`)
+                            Clipboard.setStringAsync(offerId)
+                            copySnackbarVisibilityControls.setTrue()
+                            redirectModalVisibilityControls.setTrue()
                         }}>
                             <Card.Title
                                 style={{
@@ -230,8 +306,7 @@ export default function App() {
                                 }}
                                 title={
                                     <View>
-                                        {/* <Text>{item.id}</Text> */}
-                                        <Text style={{fontWeight: 'bold'}}>{`${formatNumber(item.amount)} - ${formatMoney(item.price)}/k`}</Text>
+                                        <Text style={{fontWeight: 'bold'}}>{`${(item.direction === 'BUY' ? 'COMPRA' : 'VENDA').toUpperCase()}: ${formatNumber(item.amount)} - ${formatMoney(item.price)}/k`}</Text>
                                         <Text>{`${item.company} - ${item.pax} CPF(s)`}</Text>
                                     </View>
                                 }

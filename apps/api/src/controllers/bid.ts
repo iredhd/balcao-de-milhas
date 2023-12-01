@@ -5,7 +5,7 @@ import {mapValues} from 'lodash'
 import { Prisma } from "@prisma/client";
 import {PROGRAMS} from '@balcao-de-milhas/utils'
 
-const allowedColumnsToFilter = ['company', 'is_mentoria', 'is_mastermiles']
+const allowedColumnsToFilter = ['company', 'is_mentoria', 'is_mastermiles', 'direction']
 
 type FilterItem = {
     condition: 'eq' | 'gt' | 'lt'
@@ -46,13 +46,22 @@ export const getBidsController = async (req: Request, res: Response) => {
                         [key]: value === "true" 
                     }
                 }
+
+                if (key === 'direction') {
+                    return {
+                        direction: value
+                    }
+                }
             
                 return {}
             })
-
+            
         const items = await db.bid.findMany({
             skip: page * limit,
             take: limit,
+            orderBy: {
+                'created_at': 'desc'
+            },
             where: {
                 AND
             }
@@ -61,6 +70,9 @@ export const getBidsController = async (req: Request, res: Response) => {
         const total = await db.bid.count({
             where: {
                 AND
+            },
+            orderBy: {
+                created_at: 'desc'
             }
         })
 
@@ -73,7 +85,6 @@ export const getBidsController = async (req: Request, res: Response) => {
             }
         })
     } catch (e) {
-        console.log(e)
         return res.status(500).json({
             message: INTERNAL_ERROR
         })
