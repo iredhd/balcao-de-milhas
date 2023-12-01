@@ -1,6 +1,6 @@
 import { Link } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { FlatList, ImageBackground, ImageSourcePropType, StyleSheet, View } from 'react-native';
 import {Card, Text, ActivityIndicator, FAB, Portal, Dialog, TextInput, Button, Switch, Dropdown } from '../../components'
 import {formatDate, formatDateTime, formatMoney, formatNumber, PROGRAMS } from '@balcao-de-milhas/utils'
@@ -11,6 +11,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
 import Fuse from 'fuse.js'
 import {Formik} from 'formik'
+import {uniqBy} from 'lodash'
 
 const fuse = new Fuse(PROGRAMS, {
     minMatchCharLength: 2,
@@ -27,108 +28,122 @@ const fuse = new Fuse(PROGRAMS, {
     ]
   })
 
+
+type Bid = {
+    id: number,
+    company: string,
+    price: number,
+    is_mentoria: boolean,
+    is_mastermiles: boolean,
+    pax: number
+}
+
 export default function App() {
     const theme = useTheme()
     const [filterModalVisibility, filterModalVisibilityControls] = useToggle(false)
     
+    const [bidList, setBidList] = useState<Bid[]>([])
+
+    const [page, setPage] = useState(1)
+
     const [bids, refetchBids] = useAPI({
         url: '/bid',
         params: {
-            page: 1
+            page
         }
     })
 
-
     const [filters, setFilters] = useState({
-        amount: {
-            condition: '',
-            value: ''
-        },
-        pax: {
-            condition: '',
-            value: ''
-        },
-        price: {
-            condition: '',
-            value: ''
-        },
+        // amount: {
+        //     condition: '',
+        //     value: ''
+        // },
+        // pax: {
+        //     condition: '',
+        //     value: ''
+        // },
+        // price: {
+        //     condition: '',
+        //     value: ''
+        // },
         company: {
-            condition: '',
+            condition: 'eq',
             value: ''
         },
         is_mastermiles: {
-            condition: '',
+            condition: 'eq',
             value: ''
         },
         is_mentoria: {
-            condition: '',
+            condition: 'eq',
             value: ''
         },
     })
 
+    const hasFilters = !!Object.entries(filters).filter(([_, {value}]) => value !== '').length
+    
+    useEffect(() => {
+        if (bids?.data?.items) {
+            setBidList(state => {
+                let newList = [
+                    ...state,
+                    ...bids?.data?.items
+                ] 
 
-    console.log('filterModalVisibility', filterModalVisibility)
+                return uniqBy(newList, 'id')
+            })
+        }
+    }, [bids?.data?.items])
+
   return (
     <View style={styles.container}>
         <Portal>
           <Dialog visible={filterModalVisibility} onDismiss={filterModalVisibilityControls.setFalse}>
           <Formik
-                initialValues={{ 
-                    amount: {
-                        condition: '',
-                        value: ''
-                    },
-                    company: {
-                        condition: 'eq',
-                        value: ''
-                    },
-                    is_mastermiles: {
-                        condition: 'eq',
-                        value: false
-                    },
-                    is_mentorado: {
-                        condition: 'eq',
-                        value: false
-                    }
+                initialValues={filters}
+                onSubmit={values => {
+                    filterModalVisibilityControls.setFalse()
+                    setBidList([])
+                    setPage(1)
+
+                    setFilters(values)
+
+                    refetchBids({
+                        params: {
+                            page: 1,
+                            filter: values
+                        }
+                    })
                 }}
-                onSubmit={values => console.log(values)}
             >
-            {({ handleChange, handleBlur, handleSubmit, values, setFieldValue }) => (
+            {({ handleSubmit, values, setFieldValue }) => {
+                return (
                 <View>
                 <Dialog.Title>Filtros</Dialog.Title>
                 <Dialog.Content>
                     <View>
-                        {/* <View style={{flexDirection: 'row', alignItems: 'center', backgroundColor: 'red'}}> */}
                         <Dropdown
                             label={"Companhia"}
-                            // visible={showDropDown}
-                            // showDropDown={() => setShowDropDown(true)}
-                            // onDismiss={() => setShowDropDown(false)}
-                            value={values.company.value}
-                            onSelection={(a) => {
-                                console.log(a)
+                            value={PROGRAMS.find(item => item.id === values.company.value)?.name}
+                            onSelection={({ selectedList: [value] }) => {
+                                setFieldValue('company.value', value?.id || '')
                             }}
+                            selected={values.company.value}
                             options={PROGRAMS.map(item => ({
                                 id: item.id,
                                 value: item.name
                             }))}
                         />    
-                        {/* </View> */}
-                        {/* <TextInput
-                            onChangeText={handleChange('email')}
-                            onBlur={handleBlur('email')}
-                            value={values.email}
-                        /> */}
-                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 10}}>
                             <Text>Membro Mastermiles</Text>
-                            <Switch value={values.is_mastermiles.value} onValueChange={() => {
-                                setFieldValue('is_mastermiles.value', !values.is_mastermiles.value)
+                            <Switch trackColor={theme.colors.primary} value={values.is_mastermiles.value} onValueChange={() => {
+                                setFieldValue('is_mastermiles.value', !values.is_mastermiles.value || '')
                             }} />
                         </View>
                         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                             <Text>Membro Mentoria</Text>
-                            <Switch value={values.is_mentorado.value} onValueChange={() => {
-                                setFieldValue('is_mentorado.value', !values.is_mentorado.value)
+                            <Switch trackColor={theme.colors.primary} value={values.is_mentoria.value} onValueChange={() => {
+                                setFieldValue('is_mentoria.value', !values.is_mentoria.value || '')
                             }} />
                         </View>
                     </View>
@@ -139,17 +154,17 @@ export default function App() {
                 </Button>
                 </Dialog.Actions>
             </View>
-            )}
+            )}}
             </Formik>
           </Dialog>
         </Portal>
         <FAB
-            icon="filter"
+            icon={hasFilters ? "filter-check" : "filter"}
             style={[styles.fab, {backgroundColor: theme.colors.primary}]}
             onPress={filterModalVisibilityControls.setTrue}
         />
         <FlatList 
-            data={bids?.data?.items || []}
+            data={bidList || []}
             style={{
                 width: '100%',
                 backgroundColor: '#292841'
@@ -159,36 +174,47 @@ export default function App() {
                 padding: 5,
             }}
             onRefresh={() => {
+                setPage(1)
                 refetchBids({
                     params: {
-                        page: 1
+                        page: 1,
+                        filter: filters
                     }
                 })}
             }
-            refreshing={bids.loading}
+            refreshing={bids.loading && !!bidList.length}
             ItemSeparatorComponent={() => <View style={{height: 10}} />}
             ListEmptyComponent={
                 () => {
-                    return bids.loading ? <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}><ActivityIndicator color={theme.colors.primary} /></View> : <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}><Text style={{
+                    return bids.loading ? <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}><ActivityIndicator color={theme.colors.primary} size="large" /></View> : <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}><Text style={{
                         color: 'white'
                     }}>Nenhuma oferta encontrada.</Text></View>
                 }
             }
             indicatorStyle='white'
             onEndReached={() => {
-                console.log('fim')
+                if (bids?.data?.pagination?.total > bidList.length && !bids.loading) {
+                    const newPage = page + 1
+                    
+                    setPage(newPage)
+
+                    refetchBids({
+                        params: {
+                            page: newPage,
+                            filter: filters
+                        }
+                    })
+                }
             }}
             ListFooterComponentStyle={{
                 display: bids.loading ? 'none' : 'flex',
                 height: 100,
                 justifyContent: 'center'
             }}
-            ListFooterComponent={(bids?.data?.items || []).length ? () => <ActivityIndicator color={theme.colors.primary} /> : null}
+            ListFooterComponent={(bids?.data?.pagination?.total > bidList.length) ? () => <ActivityIndicator color={theme.colors.primary} /> : null}
             renderItem={({item }) => {
                 return (
                         <Card style={{height: 180, justifyContent: 'center'}} onPress={() => {
-                            console.log('oi')
-                            
                             Toast.show({
                                 type: 'success',
                                 text1: 'Teste!',
@@ -204,6 +230,7 @@ export default function App() {
                                 }}
                                 title={
                                     <View>
+                                        {/* <Text>{item.id}</Text> */}
                                         <Text style={{fontWeight: 'bold'}}>{`${formatNumber(item.amount)} - ${formatMoney(item.price)}/k`}</Text>
                                         <Text>{`${item.company} - ${item.pax} CPF(s)`}</Text>
                                     </View>

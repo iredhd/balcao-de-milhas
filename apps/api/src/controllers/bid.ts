@@ -1,18 +1,68 @@
 import { Request, Response } from "express";
 import { db } from "../db";
 import { INTERNAL_ERROR } from "@balcao-de-milhas/validations";
+import {mapValues} from 'lodash'
+import { Prisma } from "@prisma/client";
+import {PROGRAMS} from '@balcao-de-milhas/utils'
+
+const allowedColumnsToFilter = ['company', 'is_mentoria', 'is_mastermiles']
+
+type FilterItem = {
+    condition: 'eq' | 'gt' | 'lt'
+    value: string
+}
+
+type Filter = {
+    company: FilterItem,
+    is_mentoria: FilterItem,
+    is_mastermiles: FilterItem
+}
 
 export const getBidsController = async (req: Request, res: Response) => {
     try {
         const page = Number(req.query.page || 1) - 1
-        const limit = 50
+        const limit = 20
+
+        const filter: Filter = (req.query.filter || {}) as Filter
+
+        const AND: Prisma.bidWhereInput[] = Object.entries(filter)
+            .filter(([_,item]) => item?.value)
+            .filter(([key]) => allowedColumnsToFilter.includes(key))
+            .map(([key, { value, condition }]) => {
+                if (key === 'company') {
+                    const keywords = PROGRAMS.find(item => item.id === value)?.keywords
+
+                    return {
+                        OR: keywords?.map(keyword => ({
+                            company: {
+                                contains: keyword
+                            }
+                        }))
+                    }
+                }
+
+                if (key === 'is_mentoria' || key === 'is_mastermiles') {
+                    return {
+                        [key]: value === "true" 
+                    }
+                }
+            
+                return {}
+            })
 
         const items = await db.bid.findMany({
             skip: page * limit,
-            take: limit
+            take: limit,
+            where: {
+                AND
+            }
         })
 
-        const total = await db.bid.count()
+        const total = await db.bid.count({
+            where: {
+                AND
+            }
+        })
 
         return res.json({
             items,
@@ -23,6 +73,7 @@ export const getBidsController = async (req: Request, res: Response) => {
             }
         })
     } catch (e) {
+        console.log(e)
         return res.status(500).json({
             message: INTERNAL_ERROR
         })

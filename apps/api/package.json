@@ -14,6 +14,7 @@
     "typescript": "^5.3.2"
   },
   "dependencies": {
+    "@balcao-de-milhas/utils": "*",
     "@balcao-de-milhas/validations": "*",
     "@prisma/client": "5.6.0",
     "cors": "^2.8.5",
