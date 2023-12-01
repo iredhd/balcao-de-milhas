@@ -58,6 +58,7 @@ export default function App() {
     const [filterModalVisibility, filterModalVisibilityControls] = useToggle(false)
     const [redirectModalVisibility, redirectModalVisibilityControls] = useToggle(false)
     const [copySnackbarVisibility, copySnackbarVisibilityControls] = useToggle(false)
+    const [optionsFABVisibility, optionsFABVisibilityControls] = useToggle(false)
     const [offerId, setOfferId] = useState('')
     
     const [bidList, setBidList] = useState<Bid[]>([])
@@ -166,7 +167,7 @@ export default function App() {
                             selected={values.direction.value}
                             options={bidTypes}
                         /> 
-                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 10}}>
+                        {/* <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 10}}>
                             <Text>Membro Mastermiles</Text>
                             <Switch trackColor={theme.colors.primary} value={values.is_mastermiles.value} onValueChange={() => {
                                 setFieldValue('is_mastermiles.value', !values.is_mastermiles.value || '')
@@ -177,7 +178,7 @@ export default function App() {
                             <Switch trackColor={theme.colors.primary} value={values.is_mentoria.value} onValueChange={() => {
                                 setFieldValue('is_mentoria.value', !values.is_mentoria.value || '')
                             }} />
-                        </View>
+                        </View> */}
                     </View>
                 </Dialog.Content>
                 <Dialog.Actions>
@@ -187,7 +188,7 @@ export default function App() {
                 </Dialog.Actions>
             </View>
             )}}
-            </Formik>
+        </Formik>
           </Dialog>
         </Portal>
         <Portal>
@@ -225,7 +226,11 @@ export default function App() {
             <Dialog.Actions style={{justifyContent: 'center'}}>
                 <Button mode="contained" 
                     onPress={() => {
-                        Linking.openURL('https://t.me/BDMQUEROVENDERBOT');
+                        const bid = bidList.find(item => item.offer_id === Number(offerId))
+
+                        const link = bid?.direction === 'BUY' ? 'https://t.me/BDMQUEROVENDERBOT' : 'https://t.me/BDMV1BOT'
+
+                        Linking.openURL(link);
                     }} 
                     style={{justifyContent: 'center', alignItems: 'center'}}
                 >
@@ -234,11 +239,50 @@ export default function App() {
             </Dialog.Actions>
           </Dialog>
         </Portal>
-        <FAB
-            icon={hasFilters ? "filter-check" : "filter"}
-            style={[styles.fab, {backgroundColor: theme.colors.primary}]}
-            onPress={filterModalVisibilityControls.setTrue}
+        <Portal>
+        <FAB.Group
+           visible
+           fabStyle={{
+            right: 0,
+            marginBottom: 60,
+            zIndex: 4,
+            backgroundColor: theme.colors.primary
+          }}
+          open={optionsFABVisibility}
+          icon={optionsFABVisibility ? 'dots-vertical' : 'dots-horizontal'}
+          actions={[
+            {
+              icon: 'hand-coin',
+              label: 'Comprar',
+              onPress: () => {
+                Linking.openURL('https://t.me/BDMBOT')
+              },
+              small: false,
+            },
+            {
+              icon: 'cash-plus',
+              label: 'Vender',
+              onPress: () => {
+                Linking.openURL('https://t.me/BDMBOTVBOT')
+              },
+              small: false,
+            },
+            {
+                icon: hasFilters ? "filter-check" : "filter",
+                label: 'Filtrar',
+                onPress: filterModalVisibilityControls.setTrue,
+                small: false,
+              },
+          ]}
+          onStateChange={({open}) => {
+            if (!open) {
+                optionsFABVisibilityControls.setFalse()
+            } else {
+                optionsFABVisibilityControls.setTrue()
+            }
+          }}
         />
+      </Portal>
         <FlatList 
             data={bidList || []}
             style={{
