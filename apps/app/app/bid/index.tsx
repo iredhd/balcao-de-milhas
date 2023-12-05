@@ -240,49 +240,49 @@ export default function App() {
           </Dialog>
         </Portal>
         <Portal>
-        <FAB.Group
-           visible
-           fabStyle={{
-            right: 0,
-            marginBottom: 60,
-            zIndex: 4,
-            backgroundColor: theme.colors.primary
-          }}
-          open={optionsFABVisibility}
-          icon={optionsFABVisibility ? 'dots-vertical' : 'dots-horizontal'}
-          actions={[
-            {
-              icon: 'hand-coin',
-              label: 'Comprar',
-              onPress: () => {
-                Linking.openURL('https://t.me/BDMBOT')
-              },
-              small: false,
-            },
-            {
-              icon: 'cash-plus',
-              label: 'Vender',
-              onPress: () => {
-                Linking.openURL('https://t.me/BDMBOTVBOT')
-              },
-              small: false,
-            },
-            {
-                icon: hasFilters ? "filter-check" : "filter",
-                label: 'Filtrar',
-                onPress: filterModalVisibilityControls.setTrue,
-                small: false,
-              },
-          ]}
-          onStateChange={({open}) => {
-            if (!open) {
-                optionsFABVisibilityControls.setFalse()
-            } else {
-                optionsFABVisibilityControls.setTrue()
-            }
-          }}
-        />
-      </Portal>
+            <FAB.Group
+                visible
+                fabStyle={{
+                    right: 0,
+                    marginBottom: 60,
+                    zIndex: 4,
+                    backgroundColor: theme.colors.primary
+                }}
+                open={optionsFABVisibility}
+                icon={optionsFABVisibility ? 'dots-vertical' : 'dots-horizontal'}
+                actions={[
+                    {
+                    icon: 'hand-coin',
+                    label: 'Comprar',
+                    onPress: () => {
+                        Linking.openURL('https://t.me/BDMBOT')
+                    },
+                    small: false,
+                    },
+                    {
+                    icon: 'cash-plus',
+                    label: 'Vender',
+                    onPress: () => {
+                        Linking.openURL('https://t.me/BDMBOTVBOT')
+                    },
+                    small: false,
+                    },
+                    {
+                        icon: hasFilters ? "filter-check" : "filter",
+                        label: 'Filtrar',
+                        onPress: filterModalVisibilityControls.setTrue,
+                        small: false,
+                    },
+                ]}
+                onStateChange={({open}) => {
+                    if (!open) {
+                        optionsFABVisibilityControls.setFalse()
+                    } else {
+                        optionsFABVisibilityControls.setTrue()
+                    }
+                }}
+            />
+        </Portal>
         <FlatList 
             data={bidList || []}
             style={{

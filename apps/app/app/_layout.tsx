@@ -23,6 +23,10 @@ export default function Layout() {
         }}>
             <Tabs
                 initialRouteName='bid'
+                detachInactiveScreens
+                screenOptions={{
+                    unmountOnBlur: true
+                }}
             >
                 <Tabs.Screen 
                     name='index'

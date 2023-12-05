@@ -1,5 +1,5 @@
 import express from 'express'
-import {bid} from './routes'
+import {bid, news} from './routes'
 import cors from 'cors'
 import morgan from 'morgan'
 import { config } from 'dotenv'
@@ -41,5 +41,6 @@ app.post('/webhook/milha-news', async (req, res) => {
 })
 
 app.use('/bid', bid)
+app.use('/news', news)
 
 app.listen(process.env.API_PORT, () => console.log(`Server running on port ${process.env.API_PORT}`))
