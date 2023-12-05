@@ -15,6 +15,7 @@ import {uniqBy} from 'lodash'
 import * as Clipboard from 'expo-clipboard';
 import * as Linking from 'expo-linking';
 
+
 const fuse = new Fuse(PROGRAMS, {
     minMatchCharLength: 2,
     threshold: 0.5,

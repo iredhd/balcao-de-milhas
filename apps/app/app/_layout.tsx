@@ -46,7 +46,7 @@ export default function Layout() {
                     }}
                 />
                 <Tabs.Screen 
-                    name='news/index'
+                    name='news'
                     options={{
                         title: 'Milha News',
                         tabBarIcon: (props) => {

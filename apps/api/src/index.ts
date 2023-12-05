@@ -1,10 +1,9 @@
 import express from 'express'
-import {bid, news} from './routes'
+import {bid, news, webhook} from './routes'
 import cors from 'cors'
 import morgan from 'morgan'
 import { config } from 'dotenv'
-import { logMiddleware } from './middlewares'
-import { db } from './db'
+import { logMiddleware, webhookAuthMiddleware } from './middlewares'
 
 const app = express()
 
@@ -22,25 +21,8 @@ app.get('/', (_, res) => {
   }) 
 })
 
-app.post('/webhook/bdm', (req, res) => {
-  return res.status(200).json({})
-})
-
-app.post('/webhook/milha-news', async (req, res) => {
-  const title = req.body.title
-  const link = req.body.link
-
-  await db.news.create({
-    data: {
-      title,
-      link
-    }
-  })
-
-  return res.status(201).end()
-})
-
 app.use('/bid', bid)
 app.use('/news', news)
+app.use('/webhook', webhookAuthMiddleware, webhook)
 
 app.listen(process.env.API_PORT, () => console.log(`Server running on port ${process.env.API_PORT}`))

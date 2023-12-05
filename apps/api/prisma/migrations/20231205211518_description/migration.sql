@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `log` MODIFY `url` LONGTEXT NOT NULL;

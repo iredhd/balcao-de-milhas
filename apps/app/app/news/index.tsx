@@ -15,28 +15,17 @@ import {uniqBy} from 'lodash'
 import * as Clipboard from 'expo-clipboard';
 import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
-
-const fuse = new Fuse(PROGRAMS, {
-    minMatchCharLength: 2,
-    threshold: 0.5,
-    isCaseSensitive: false,
-    useExtendedSearch: true,
-    ignoreFieldNorm: true,
-    ignoreLocation: true,
-    shouldSort: true,
-    fieldNormWeight: 0,
-
-    keys: [
-      'keywords'
-    ]
-  })
+// import LinkPreview from "expo-link-preview";
+import { LinkPreview } from '@flyerhq/react-native-link-preview'
+import {getLinkPreview} from 'link-preview-js';
 
 
 type News = {
     id: number,
     created_at: Date,
     title: string,
-    link: string
+    link: string,
+    description?: string
 }
 
 export default function App() {
@@ -93,7 +82,7 @@ export default function App() {
                 () => {
                     return news.loading ? <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}><ActivityIndicator color={theme.colors.primary} size="large" /></View> : <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}><Text style={{
                         color: 'white'
-                    }}>Nenhuma oferta encontrada.</Text></View>
+                    }}>Nenhuma notícia encontrada.</Text></View>
                 }
             }
             indicatorStyle='white'
@@ -116,32 +105,62 @@ export default function App() {
                 justifyContent: 'center'
             }}
             ListFooterComponent={(news?.data?.pagination?.total > newsList.length) ? () => <ActivityIndicator color={theme.colors.primary} /> : null}
-            renderItem={({item }) => {
+            renderItem={({ item }) => {
                 return (
-                        <Card style={{
-                            height: 100,
-                            paddingVertical: 5,
-                            paddingRight: 10
-                        }} onPress={() => {
-                            WebBrowser.openBrowserAsync(!item.link.includes('http') ? `http://${item.link}` : item.link)
-                        }}>
-                            <Card.Title
-                                titleStyle={{
-                                    fontSize: 16,
-                                    lineHeight: 16,
-                                    marginBottom: 10,
-                                }}
-                                titleNumberOfLines={4}
-                                title={item.title}
-                                subtitle={formatDateTime(item.created_at)}
-                            />
-                        </Card>
+                    <NewsCard 
+                        {...item}
+                    />
                 )
             }}
             keyExtractor={item => item.id.toString()}
         />
     </View>
   );
+}
+
+const NewsCard = ({link: propLink, title, description }: News) => {
+    const link = !propLink.includes('http') ? `http://${propLink}` : propLink
+    const [isLoading, isLoadingControls] = useToggle(true)
+    
+    const [preview, setPreview] = useState<undefined | { image?: string, description: string }>()
+
+    useEffect(() => {
+        if (description) {
+            setPreview({
+                description: description
+            })
+            isLoadingControls.setFalse()
+        } else {
+            getLinkPreview(link, {
+                timeout: 10 * 1000,
+                followRedirects: "follow",
+            })
+            .then((response) => {
+                setPreview({
+                    image: response.images[response.images.length - 1] || undefined,
+                    description: response.description
+                })
+            })
+            .catch(() => {})
+            .finally(() => {
+                isLoadingControls.setFalse()
+            })
+        }
+    }, [link, description])
+    
+    return (
+        <Card onPress={() => {
+            WebBrowser.openBrowserAsync(link)
+        }}>
+            <Card.Content>
+                {isLoading && (<View style={{marginTop: 15}}>
+                    <ActivityIndicator />
+                </View>)}
+                <Text style={{fontWeight: 'bold' }}>{title}</Text>
+                {preview?.description && <Text style={{marginTop: 10}}>{preview?.description}</Text>}
+            </Card.Content>
+        </Card>
+    )
 }
 
 const styles = StyleSheet.create({

@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { db } from "../db";
 import { INTERNAL_ERROR } from "@balcao-de-milhas/validations";
-import {mapValues} from 'lodash'
 import { Prisma } from "@prisma/client";
 import {PROGRAMS} from '@balcao-de-milhas/utils'
 

@@ -38,6 +38,7 @@ model news {
   created_at DateTime @default(now())
   title String
   link String
+  description String? @db.LongText
 }
 
 enum log_method {
@@ -55,8 +56,8 @@ model log {
   id Int @id @default(autoincrement())
   created_at DateTime @default(now())
   ip String
-  url String
-  headers Json
+  url String @db.LongText
+  headers Json 
   body Json
   method log_method
 }
