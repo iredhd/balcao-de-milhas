@@ -3,7 +3,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ThemeProvider, DarkTheme, useTheme } from '@react-navigation/native';
 import Toast from 'react-native-toast-message'
 import {Provider, DefaultTheme, ThemeProvider as RNThemeProvider} from 'react-native-paper'
-  
+import { Splash } from '../components';
+
 export default function Layout() {
   return (
       <Provider theme={{
@@ -21,6 +22,7 @@ export default function Layout() {
                 primary: '#55bf0a'
             }
         }}>
+            <Splash />
             <Tabs
                 initialRouteName='bid'
                 detachInactiveScreens

@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `bid` ADD COLUMN `date_of_first_join` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    ADD COLUMN `number_of_communities` INTEGER NOT NULL DEFAULT 1;

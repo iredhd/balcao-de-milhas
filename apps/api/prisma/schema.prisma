@@ -31,6 +31,8 @@ model bid {
   member_since DateTime @default(now())
   is_mastermiles Boolean @default(false)
   is_mentoria Boolean @default(false)
+  number_of_communities Int @default(1)
+  date_of_first_join DateTime @default(now())
 }
 
 model news {

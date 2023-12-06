@@ -1,5 +1,5 @@
 import { Link, Slot } from 'expo-router';
-// import { StatusBar } from 'expo-status-bar';
+import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { FlatList, SafeAreaView, StyleSheet, Text, StatusBar } from 'react-native';
 
 const styles = StyleSheet.create({
@@ -12,16 +12,8 @@ const styles = StyleSheet.create({
 export default function Layout() {
   return (
     <SafeAreaView style={styles.container}>
+      <ExpoStatusBar style="light" />     
         <Slot />
     </SafeAreaView>
   );
 }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#fff',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-// });
