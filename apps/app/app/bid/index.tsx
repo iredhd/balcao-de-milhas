@@ -15,7 +15,7 @@ import {uniqBy} from 'lodash'
 import * as Clipboard from 'expo-clipboard';
 import * as Linking from 'expo-linking';
 import moment from 'moment'
-
+import currency from 'currency.js'
 
 const fuse = new Fuse(PROGRAMS, {
     minMatchCharLength: 2,
@@ -345,7 +345,7 @@ export default function App() {
                 const claimsText = claims === 0 ? '0' : claims <  10 ? '-10' : `+${claims}`
 
                 return (
-                        <Card style={{height: 200, justifyContent: 'center'}} onPress={() => {
+                        <Card style={{height: 220, justifyContent: 'center'}} onPress={() => {
                             setOfferId(`${item.offer_id}`)
                             Clipboard.setStringAsync(offerId)
                             copySnackbarVisibilityControls.setTrue()
@@ -362,6 +362,7 @@ export default function App() {
                                     <View>
                                         <Text style={{fontWeight: 'bold'}}>{`${(item.direction === 'BUY' ? 'COMPRA' : 'VENDA').toUpperCase()}: ${formatNumber(item.amount)} - ${formatMoney(item.price)}/k`}</Text>
                                         <Text>{`${item.company} - ${item.pax} CPF(s)`}</Text>
+                                        <Text>{`${formatMoney(currency(currency(item.amount, {precision: 3}).divide(1000).value, {precision: 2}).multiply(item.price).value)}`}</Text>
                                     </View>
                                 }
                                 subtitle={
