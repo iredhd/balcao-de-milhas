@@ -14,6 +14,7 @@ import {Formik} from 'formik'
 import {uniqBy} from 'lodash'
 import * as Clipboard from 'expo-clipboard';
 import * as Linking from 'expo-linking';
+import moment from 'moment'
 
 
 const fuse = new Fuse(PROGRAMS, {
@@ -47,6 +48,8 @@ type Bid = {
     cancell_return_percentage: number
     offer_id: number
     direction: 'BUY' | 'SELL'
+    number_of_communities: number
+    date_of_first_join: Date
 }
 
 const bidTypes = [
@@ -63,7 +66,7 @@ export default function App() {
     const [offerId, setOfferId] = useState('')
     
     const [bidList, setBidList] = useState<Bid[]>([])
-
+    
     const [page, setPage] = useState(1)
 
     const [bids, refetchBids] = useAPI({
@@ -335,8 +338,14 @@ export default function App() {
             }}
             ListFooterComponent={(bids?.data?.pagination?.total > bidList.length) ? () => <ActivityIndicator color={theme.colors.primary} /> : null}
             renderItem={({item }) => {
+                const recommendations = Math.floor(item.recommendations / 10) * 10
+                const claims = Math.floor(item.claims / 10) * 10
+
+                const recommendationsText = recommendations === 0 ? '0' : recommendations < 10 ? '-10' : `+${recommendations}`
+                const claimsText = claims === 0 ? '0' : claims <  10 ? '-10' : `+${claims}`
+
                 return (
-                        <Card style={{height: 180, justifyContent: 'center'}} onPress={() => {
+                        <Card style={{height: 200, justifyContent: 'center'}} onPress={() => {
                             setOfferId(`${item.offer_id}`)
                             Clipboard.setStringAsync(offerId)
                             copySnackbarVisibilityControls.setTrue()
@@ -359,8 +368,8 @@ export default function App() {
                                     <View>
                                         <Text>{formatDateTime(item.created_at)}</Text>
                                         <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                            <Text style={{marginRight: 2}}>{formatNumber(item.recommendations)}</Text><MaterialCommunityIcons name='thumb-up' />
-                                            <Text style={{marginRight: 2, marginLeft: 5}}>{formatNumber(item.claims)}</Text><MaterialCommunityIcons name='thumb-down' />
+                                            <Text style={{marginRight: 2}}>{recommendationsText}</Text><MaterialCommunityIcons name='thumb-up' />
+                                            <Text style={{marginRight: 2, marginLeft: 5}}>{claimsText}</Text><MaterialCommunityIcons name='thumb-down' />
                                         </View>
                                         {item.is_mastermiles && (<View style={{flexDirection: 'row', alignItems: 'center'}}>
                                             <MaterialCommunityIcons name='star' style={{marginRight: 2}}  />
@@ -371,7 +380,13 @@ export default function App() {
                                             <Text style={{fontStyle: 'italic', fontSize: 12}}>Mentorado</Text>
                                         </View>)}
                                         <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                            <Text style={{fontStyle: 'italic', fontSize: 12}}>Membro desde {formatDate(item.member_since)}</Text>
+                                            <Text style={{fontStyle: 'italic', fontSize: 12}}>Membro do balcão há {moment().diff(moment(item.member_since),'months')} meses</Text>
+                                        </View>
+                                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                            <Text style={{fontStyle: 'italic', fontSize: 12}}>Membro de {item.number_of_communities} curso{item.number_of_communities > 1 ? 's': ''}</Text>
+                                        </View>
+                                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                            <Text style={{fontStyle: 'italic', fontSize: 12}}>Entrou no primeiro curso há {moment().diff(moment(item.member_since),'months')} meses</Text>
                                         </View>
                                         <Text style={{fontStyle: 'italic', fontSize: 12}}>{`${formatNumber(item.cancell_return_percentage)}% de reembolso em caso de cancelamento`}</Text>
                                     </View>
