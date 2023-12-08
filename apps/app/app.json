@@ -16,6 +16,7 @@
       "**/*"
     ],
     "ios": {
+      "buildNumber": 5,
       "supportsTablet": false,
       "bundleIdentifier": "com.sdpj.balcaodemilhas"
     },
