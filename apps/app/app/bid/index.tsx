@@ -344,6 +344,14 @@ export default function App() {
                 const recommendationsText = recommendations === 0 ? '0' : recommendations < 10 ? '-10' : `+${recommendations}`
                 const claimsText = claims === 0 ? '0' : claims <  10 ? '-10' : `+${claims}`
 
+                const [result] = fuse.search<typeof PROGRAMS>(item.company, {
+                    limit: 1
+                })
+
+                const source: ImageSourcePropType = result?.item?.icon ? {
+                    uri: result?.item.icon
+                } : require('../../assets/no-image.png')
+
                 return (
                         <Card style={{height: 220, justifyContent: 'center'}} onPress={() => {
                             setOfferId(`${item.offer_id}`)
@@ -351,22 +359,72 @@ export default function App() {
                             copySnackbarVisibilityControls.setTrue()
                             redirectModalVisibilityControls.setTrue()
                         }}>
-                            <Card.Title
+                            <View style={{
+                                flex: 1,
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                padding: 10
+                            }}>
+                                <View>
+                                    <ImageBackground resizeMode='contain' source={source}>
+                                        <View style={{width: 50, height: 50}} />
+                                    </ImageBackground>
+                                </View>
+                                <View style={{flex: 1, padding: 10 }}>
+                                    <View style={{}}>
+                                        <Text style={{fontWeight: 'bold'}}>{`${(item.direction === 'BUY' ? 'COMPRA' : 'VENDA').toUpperCase()}: ${formatNumber(item.amount)} - ${formatMoney(item.price)}/k`}</Text>
+                                        <Text>{`${item.company} - ${item.pax} CPF(s)`}</Text>
+                                        <Text>{`${formatMoney(currency(currency(item.amount, {precision: 3}).divide(1000).value, {precision: 2}).multiply(item.price).value)}`}</Text>
+                                    </View>
+                                    <View style={{ marginTop: 10}}>
+                                        <Text>{formatDateTime(item.created_at)}</Text>
+                                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                            <Text style={{marginRight: 2}}>{recommendationsText}</Text><MaterialCommunityIcons name='thumb-up' />
+                                            <Text style={{marginRight: 2, marginLeft: 5}}>{claimsText}</Text><MaterialCommunityIcons name='thumb-down' />
+                                        </View>
+                                        {item.is_mastermiles && (<View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                            <MaterialCommunityIcons name='star' style={{marginRight: 2}}  />
+                                            <Text style={{fontStyle: 'italic', fontSize: 12}}>Membro Mastermiles</Text>
+                                        </View>)}
+                                        {item.is_mentoria && (<View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                            <MaterialCommunityIcons name='star' style={{marginRight: 2}}  />
+                                            <Text style={{fontStyle: 'italic', fontSize: 12}}>Mentorado</Text>
+                                        </View>)}
+                                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                            <Text style={{fontStyle: 'italic', fontSize: 12}}>Membro do balcão há {moment().diff(moment(item.member_since),'months')} meses</Text>
+                                        </View>
+                                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                            <Text style={{fontStyle: 'italic', fontSize: 12}}>Membro de {item.number_of_communities} curso{item.number_of_communities > 1 ? 's': ''}</Text>
+                                        </View>
+                                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                            <Text style={{fontStyle: 'italic', fontSize: 12}}>Entrou no primeiro curso há {moment().diff(moment(item.member_since),'months')} meses</Text>
+                                        </View>
+                                        <Text style={{fontStyle: 'italic', fontSize: 12}}>{`${formatNumber(item.cancell_return_percentage)}% de reembolso em caso de cancelamento`}</Text>
+                                    </View>
+                                </View>
+                                <View>
+                                    <IconButton icon="arrow-right" />
+                                </View>
+                            {/* <Card.Title
                                 style={{
-                                    flex: 1,
+                                    // flex: 1,
+                                    backgroundColor: 'red',
+                                    // justifyContent: 'space-between'
                                 }}
                                 subtitleStyle={{
                                     marginTop: 10
                                 }}
                                 title={
-                                    <View>
+                                    <View style={{backgroundColor: 'yellow', flex: 1}}>
                                         <Text style={{fontWeight: 'bold'}}>{`${(item.direction === 'BUY' ? 'COMPRA' : 'VENDA').toUpperCase()}: ${formatNumber(item.amount)} - ${formatMoney(item.price)}/k`}</Text>
                                         <Text>{`${item.company} - ${item.pax} CPF(s)`}</Text>
                                         <Text>{`${formatMoney(currency(currency(item.amount, {precision: 3}).divide(1000).value, {precision: 2}).multiply(item.price).value)}`}</Text>
                                     </View>
+
                                 }
                                 subtitle={
-                                    <View>
+                                    <View style={{backgroundColor: 'green', flex: 1}}>
                                         <Text>{formatDateTime(item.created_at)}</Text>
                                         <View style={{flexDirection: 'row', alignItems: 'center'}}>
                                             <Text style={{marginRight: 2}}>{recommendationsText}</Text><MaterialCommunityIcons name='thumb-up' />
@@ -412,7 +470,8 @@ export default function App() {
                                         <IconButton icon="arrow-right" />
                                     )
                                 }}
-                            />
+                            /> */}
+                            </View>
                         </Card>
                 )
             }}

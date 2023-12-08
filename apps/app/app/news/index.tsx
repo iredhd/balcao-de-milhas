@@ -153,10 +153,10 @@ const NewsCard = ({link: propLink, title, description }: News) => {
             WebBrowser.openBrowserAsync(link)
         }}>
             <Card.Content>
+                <Text style={{fontWeight: 'bold' }}>{title}</Text>
                 {isLoading && (<View style={{marginTop: 15}}>
                     <ActivityIndicator />
                 </View>)}
-                <Text style={{fontWeight: 'bold' }}>{title}</Text>
                 {preview?.description && <Text style={{marginTop: 10}}>{preview?.description}</Text>}
             </Card.Content>
         </Card>
