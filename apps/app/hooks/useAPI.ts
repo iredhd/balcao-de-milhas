@@ -9,6 +9,8 @@ const API = Axios.create({
     baseURL: `${process.env.EXPO_PUBLIC_API_URL}`
 })
 
+alert(process.env.EXPO_PUBLIC_API_URL)
+
 API.interceptors.response.use(success => success, (error: AxiosError<{ message?: string }>) => {
     if ([403, 409].includes(error.response?.status as number)) {
         // enqueueSnackbar(error.response?.data.message || 'Erro interno! Entre em contato com o administrador do sistema', {

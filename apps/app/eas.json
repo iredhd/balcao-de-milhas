@@ -6,14 +6,21 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "channel": "development"
+      "channel": "development",
+      "android": {
+        "buildType": "apk"
+      }
     },
     "preview": {
       "distribution": "internal",
       "channel": "preview"
     },
     "production": {
-      "channel": "production"
+      "channel": "production",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api-app.balcaodemilhas.com.br",
+        "EXPO_ROUTER_APP_ROOT": "apps"
+      }
     }
   },
   "submit": {

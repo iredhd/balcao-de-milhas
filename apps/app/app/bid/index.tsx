@@ -1,7 +1,7 @@
 import { Link } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Fragment, useEffect, useState } from 'react';
-import { FlatList, ImageBackground, ImageSourcePropType, StyleSheet, View } from 'react-native';
+import { FlatList, ImageBackground, ImageSourcePropType, StyleSheet, TouchableOpacity, View } from 'react-native';
 import {Card, Text, ActivityIndicator, FAB, Portal, Dialog, TextInput, Button, Switch, Dropdown } from '../../components'
 import {formatDate, formatDateTime, formatMoney, formatNumber, PROGRAMS } from '@balcao-de-milhas/utils'
 import { Avatar, IconButton, Snackbar } from 'react-native-paper';
@@ -353,12 +353,13 @@ export default function App() {
                 } : require('../../assets/no-image.png')
 
                 return (
-                        <Card style={{height: 220, justifyContent: 'center'}} onPress={() => {
+                        <TouchableOpacity onPress={() => {
                             setOfferId(`${item.offer_id}`)
                             Clipboard.setStringAsync(offerId)
                             copySnackbarVisibilityControls.setTrue()
                             redirectModalVisibilityControls.setTrue()
                         }}>
+                        <Card style={{height: 220, justifyContent: 'center'}} >
                             <View style={{
                                 flex: 1,
                                 flexDirection: 'row',
@@ -473,6 +474,7 @@ export default function App() {
                             /> */}
                             </View>
                         </Card>
+                        </TouchableOpacity>
                 )
             }}
             keyExtractor={item => item.id.toString()}
