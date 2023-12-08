@@ -1,6 +1,6 @@
 {
   "name": "@balcao-de-milhas/app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.ts",
   "scripts": {
     "start": "EXPO_USE_METRO_WORKSPACE_ROOT=1 npx expo start -c",
