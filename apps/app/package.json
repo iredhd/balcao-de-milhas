@@ -1,6 +1,6 @@
 {
   "name": "@balcao-de-milhas/app",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "index.ts",
   "scripts": {
     "start": "EXPO_USE_METRO_WORKSPACE_ROOT=1 npx expo start -c",
@@ -11,6 +11,7 @@
   "dependencies": {
     "@babel/plugin-transform-private-methods": "^7.23.3",
     "@balcao-de-milhas/utils": "*",
+    "@balcao-de-milhas/validations": "1.0.0",
     "@flyerhq/react-native-link-preview": "^1.6.0",
     "axios": "^1.6.2",
     "axios-hooks": "^5.0.2",
@@ -19,8 +20,10 @@
     "expo-clipboard": "~4.3.1",
     "expo-constants": "~14.4.2",
     "expo-dev-client": "~2.4.12",
+    "expo-device": "~5.4.0",
     "expo-link-preview": "^1.3.2",
     "expo-linking": "~5.0.2",
+    "expo-notifications": "~0.20.1",
     "expo-router": "^2.0.0",
     "expo-status-bar": "~1.6.0",
     "expo-updates": "~0.18.17",

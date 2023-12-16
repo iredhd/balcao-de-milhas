@@ -1,5 +1,5 @@
 import express from 'express'
-import {bid, news, webhook} from './routes'
+import {bid, device, news, webhook} from './routes'
 import cors from 'cors'
 import morgan from 'morgan'
 import { config } from 'dotenv'
@@ -24,5 +24,6 @@ app.get('/', (_, res) => {
 app.use('/bid', bid)
 app.use('/news', news)
 app.use('/webhook', webhookAuthMiddleware, webhook)
+app.use('/device', device)
 
 app.listen(process.env.API_PORT, () => console.log(`Server running on port ${process.env.API_PORT}`))

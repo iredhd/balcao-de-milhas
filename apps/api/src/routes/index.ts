@@ -1,3 +1,4 @@
 export * from './bid'
 export * from './new'
 export * from './webhook'
+export * from './device'

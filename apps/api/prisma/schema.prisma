@@ -63,3 +63,11 @@ model log {
   body Json
   method log_method
 }
+
+model device {
+  id Int @id @default(autoincrement())
+  created_at DateTime @default(now())
+  build_id String @unique
+  device_info Json
+  push_token String?
+}
