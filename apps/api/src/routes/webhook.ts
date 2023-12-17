@@ -29,7 +29,7 @@ webhook.post('/milha-news', async (req, res) => {
       }
     })
 
-    const to = devices.filter(item => !!item.push_token).map(item => item.push_token)
+    const to = devices.filter(item => item.push_token !== null).map(item => item.push_token as string)
 
     try {
       await expo.sendPushNotificationsAsync([

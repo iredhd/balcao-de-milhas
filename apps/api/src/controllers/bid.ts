@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { db } from "../db";
 import { INTERNAL_ERROR } from "@balcao-de-milhas/validations";
-import { Prisma } from "@prisma/client";
+import { bid_direction, Prisma } from "@prisma/client";
 import {PROGRAMS} from '@balcao-de-milhas/utils'
 
 const allowedColumnsToFilter = ['company', 'is_mentoria', 'is_mastermiles', 'direction']
@@ -48,7 +48,7 @@ export const getBidsController = async (req: Request, res: Response) => {
 
                 if (key === 'direction') {
                     return {
-                        direction: value
+                        direction: value as bid_direction
                     }
                 }
             
