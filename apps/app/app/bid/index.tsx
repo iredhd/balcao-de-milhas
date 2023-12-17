@@ -229,12 +229,15 @@ export default function App() {
             </Dialog.Content>
             <Dialog.Actions style={{justifyContent: 'center'}}>
                 <Button mode="contained" 
-                    onPress={() => {
+                    onPress={async () => {
                         const bid = bidList.find(item => item.offer_id === Number(offerId))
 
                         const link = bid?.direction === 'BUY' ? 'https://t.me/BDMQUEROVENDERBOT' : 'https://t.me/BDMV1BOT'
+                        const schema = bid?.direction === 'BUY' ? `tg://resolve?domain=BDMQUEROVENDERBOT&text=${offerId}` : `tg://resolve?domain=BDMV1BOT&text=${offerId}`
 
-                        Linking.openURL(link);
+                        const canOpenSchema = await Linking.canOpenURL(schema)
+
+                        Linking.openURL(canOpenSchema ? schema : link);
                     }} 
                     style={{justifyContent: 'center', alignItems: 'center'}}
                 >

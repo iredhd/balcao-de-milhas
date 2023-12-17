@@ -2,7 +2,7 @@
   "expo": {
     "name": "Balcão de Milhas",
     "slug": "balcao-de-milhas",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -18,7 +18,10 @@
     "ios": {
       "buildNumber": "6",
       "supportsTablet": false,
-      "bundleIdentifier": "com.sdpj.balcaodemilhas"
+      "bundleIdentifier": "com.sdpj.balcaodemilhas",
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": ["tg"]
+      }
     },
     "android": {
       "versionCode": 6,
