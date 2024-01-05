@@ -24,16 +24,17 @@ export default function Layout() {
         }}>
             <Splash />
             <Tabs
-                initialRouteName='bid'
+                initialRouteName='index'
                 detachInactiveScreens
                 screenOptions={{
-                    unmountOnBlur: true
+                    unmountOnBlur: true,
                 }}
             >
                 <Tabs.Screen 
                     name='index'
                     options={{
-                        href: null
+                        href: null,
+                        headerShown: false,
                     }}
                 />
                 <Tabs.Screen 
