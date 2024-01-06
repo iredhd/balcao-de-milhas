@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "886508128456",
+    "project_id": "balcao-de-milh-as",
+    "storage_bucket": "balcao-de-milh-as.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:886508128456:android:76eebc41fdaed2f8cc3dfd",
+        "android_client_info": {
+          "package_name": "com.sdpj.balcaodemilhas"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCryZM6WmBXEoWAzFAKjvdEL_xFcUKsETw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

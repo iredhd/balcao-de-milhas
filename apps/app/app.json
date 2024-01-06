@@ -29,7 +29,8 @@
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.sdpj.balcaodemilhas"
+      "package": "com.sdpj.balcaodemilhas",
+      "googleServicesFile": "./google-services.json"
     },
     "plugins": [
       "expo-router"
