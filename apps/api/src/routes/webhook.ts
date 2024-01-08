@@ -36,7 +36,10 @@ webhook.post('/milha-news', async (req, res) => {
         {
           to,
           title: title,
-          body: description
+          body: description,
+          data: {
+            link: link || null
+          }
         }
       ]);
     } catch (error) {

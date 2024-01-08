@@ -8,6 +8,7 @@ import Constants from 'expo-constants';
 import {ActivityIndicator} from '../components'
 import { Subscription } from 'expo-notifications';
 import { router } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -70,8 +71,14 @@ export default function App() {
       })
     });
 
-    notificationListener.current = Notifications.addNotificationResponseReceivedListener(() => {
-      router.replace('/news')
+    notificationListener.current = Notifications.addNotificationResponseReceivedListener(data => {
+      if (data.notification.request.content.data?.link) {
+        const link = !data.notification.request.content.data?.link.includes('http') ? `http://${data.notification.request.content.data?.link}` : data.notification.request.content.data?.link
+
+        WebBrowser.openBrowserAsync(link)
+      } else {
+        router.replace('/news')
+      }
     });
   }, []);
 
