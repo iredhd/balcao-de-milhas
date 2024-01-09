@@ -104,6 +104,18 @@ webhook.delete('/bid/:offer_id', async (req, res) => {
   const offer_id = Number(req.params.offer_id)
 
   try {
+    const bid = await db.bid.findUnique({
+      where: {
+        offer_id: offer_id
+      }
+    })
+
+    if (!bid) {
+      return res.status(204).json({
+        message: 'Oferta não encontrada.'
+      })
+    }
+
     await db.bid.delete({
       where: {
         offer_id: offer_id
