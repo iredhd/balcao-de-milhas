@@ -100,6 +100,24 @@ webhook.post('/bid', async (req, res) => {
   }
 })
 
+webhook.delete('/bid/:offer_id', async (req, res) => {
+  const offer_id = Number(req.params.offer_id)
+
+  try {
+    await db.bid.delete({
+      where: {
+        offer_id: offer_id
+      }
+    })
+
+    return res.status(204).end()
+  } catch (e) {
+    return res.status(500).json({
+      message: (e as Error)?.message
+    })
+  }
+})
+
 webhook.post('/bdm', async (req, res) => {
   return res.status(201).end()
 })
