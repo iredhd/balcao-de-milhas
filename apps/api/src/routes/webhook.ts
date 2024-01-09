@@ -29,31 +29,26 @@ webhook.post('/milha-news', async (req, res) => {
       }
     })
 
-    const to = devices.filter(item => item.push_token !== null).map(item => item.push_token as string)
-    console.log(JSON.stringify([
-      {
-        to,
+    const messages = devices.filter(item => item.push_token !== null).map(item => {
+      return {
         title: title,
         body: description,
         data: {
           link: link || null
-        }
+        },
+        to: item.push_token as string
       }
-    ]))
-    try {
-      await expo.sendPushNotificationsAsync([
-        {
-          to,
-          title: title,
-          body: description,
-          data: {
-            link: link || null
-          }
-        }
-      ]);
-    } catch (error) {
-      console.error(error);
-    } 
+    })
+
+    const chunks = expo.chunkPushNotifications(messages);
+    console.log(JSON.stringify(chunks))
+    for (let chunk of chunks) {
+      try {
+        await expo.sendPushNotificationsAsync(chunk);
+      } catch (error) {
+        console.error(error);
+      } 
+    }
   }
 
   return res.status(201).end()
