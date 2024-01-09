@@ -3,7 +3,7 @@ import {bid, device, news, webhook} from './routes'
 import cors from 'cors'
 import morgan from 'morgan'
 import { config } from 'dotenv'
-import { logMiddleware, webhookAuthMiddleware } from './middlewares'
+import { logMiddleware, removeOldRowsMiddleware, webhookAuthMiddleware } from './middlewares'
 
 const app = express()
 
@@ -14,6 +14,7 @@ app.use(morgan('tiny'));
 app.use(cors());
 app.use(express.json());
 app.use(logMiddleware)
+app.use(removeOldRowsMiddleware)
 
 app.get('/', (_, res) => {
   return res.status(200).json({
