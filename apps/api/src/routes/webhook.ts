@@ -50,6 +50,10 @@ webhook.post('/milha-news', async (req, res) => {
   return res.status(201).end()
 })
 
+webhook.post('/bid', async (req, res) => {
+  return res.status(201).end()
+})
+
 webhook.post('/bdm', async (req, res) => {
   return res.status(201).end()
 })
