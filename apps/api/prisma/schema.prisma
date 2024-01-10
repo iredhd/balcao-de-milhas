@@ -71,3 +71,37 @@ model device {
   device_info Json
   push_token String?
 }
+
+model order {
+  id Int @id @default(autoincrement())
+  created_at DateTime @default(now())
+  transaction String @unique()
+  buyer_id Int
+  buyer buyer @relation(fields: [buyer_id], references: [id])
+}
+
+model buyer {
+  id Int @id @default(autoincrement())
+  created_at DateTime @default(now())
+  name String
+  email String @unique()
+  document String?
+  external_id String? @unique()
+  orders order[]
+  buyer_verification buyer_verification?
+}
+
+enum buyer_verification_status {
+  PENDING
+  COMPLETED
+  DENIED
+  APPROVED
+}
+model buyer_verification {
+  id Int @id @default(autoincrement())
+  created_at DateTime @default(now())
+  external_id String? @unique()
+  status buyer_verification_status @default(PENDING)
+  buyer_id Int @unique()
+  buyer buyer @relation(fields: [buyer_id], references: [id])
+}

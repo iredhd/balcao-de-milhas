@@ -7,6 +7,7 @@
   "scripts": {
     "dev:app": "yarn workspace @balcao-de-milhas/app run start",
     "dev:api": "yarn workspace @balcao-de-milhas/api run dev",
+    "dev:valida": "yarn workspace @balcao-de-milhas/valida run start",
     "build": "yarn workspace @balcao-de-milhas/api run build",
     "build:essentials": "yarn workspace @balcao-de-milhas/utils run build && yarn workspace @balcao-de-milhas/validations run build",
     "db:migrate": "yarn workspace @balcao-de-milhas/api migrate"
