@@ -95,8 +95,8 @@ enum buyer_verification_status {
   PENDING
   COMPLETED
   DENIED
-  WAITING_MANUAL_ACTION
   APPROVED
+  WAITING_MANUAL_ACTION
 }
 model buyer_verification {
   id Int @id @default(autoincrement())
