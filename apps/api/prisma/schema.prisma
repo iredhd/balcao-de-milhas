@@ -85,7 +85,7 @@ model buyer {
   created_at DateTime @default(now())
   name String
   email String @unique()
-  document String?
+  document String? @unique()
   external_id String? @unique()
   orders order[]
   buyer_verification buyer_verification?
@@ -95,6 +95,7 @@ enum buyer_verification_status {
   PENDING
   COMPLETED
   DENIED
+  WAITING_MANUAL_ACTION
   APPROVED
 }
 model buyer_verification {

@@ -40,6 +40,8 @@ export const getVerificationStatusLabel = (status: string) => {
             return 'Completo'
         case 'DENIED':
             return 'Recusado'
+        case 'WAITING_MANUAL_ACTION':
+            return 'Aguardando Validação Manual'
         default:
             return ''
     }
@@ -55,6 +57,8 @@ export const getVerificationStatusColor = (status: string) => {
             return 'info'
         case 'DENIED':
             return 'error'
+        case 'WAITING_MANUAL_ACTION':
+            return 'warning'
         default:
             return undefined
     }
@@ -65,4 +69,5 @@ export const STATUS_OPTIONS = [
     { value: 'COMPLETED', label: getVerificationStatusLabel('COMPLETED') },
     { value: 'DENIED', label: getVerificationStatusLabel('DENIED') },
     { value: 'APPROVED', label: getVerificationStatusLabel('APPROVED') },
+    { value: 'WAITING_MANUAL_ACTION', label: getVerificationStatusLabel('WAITING_MANUAL_ACTION') },
 ]

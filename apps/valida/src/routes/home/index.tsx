@@ -195,7 +195,7 @@ export function Home() {
                     </Grid>
                     {searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING' ? (<Grid item xs={12} textAlign="left">
                         <Alert color='info' icon={false}>
-                            <strong>Validação {searchedOrder.data?.buyer.buyer_verification.status === 'COMPLETED' ? ' em andamento' : 'finalizada'}!</strong>
+                            <strong>Validação {['COMPLETED', 'WAITING_MANUAL_ACTION'].includes(searchedOrder.data?.buyer.buyer_verification.status) ? ' em andamento' : 'finalizada'}!</strong>
                             <br /><br />
                             <strong>Status:</strong> {STATUS_OPTIONS.find(item => item.value === searchedOrder.data?.buyer.buyer_verification.status)?.label}
                             
