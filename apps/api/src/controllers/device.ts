@@ -6,11 +6,11 @@ export const createDeviceController = async (req: Request, res: Response) => {
     try {
         await db.device.upsert({
             where: {
-                build_id: req.body.build_id,
+                push_token: req.body.push_token,
             },
             update: {
                 device_info: req.body.device_info,
-                push_token: req.body.push_token
+                build_id: req.body.build_id,
             },
             create: {
                 build_id: req.body.build_id,
