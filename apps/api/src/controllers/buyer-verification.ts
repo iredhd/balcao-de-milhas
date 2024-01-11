@@ -1,8 +1,9 @@
-import { HttpStatusCode } from 'axios';
+import { AxiosError, HttpStatusCode } from 'axios';
 import { Request, Response } from "express";
 import { db } from "../db";
 import { INTERNAL_ERROR } from "@balcao-de-milhas/validations";
 import jwt from 'jsonwebtoken'
+import { IDWALL_API } from '../service';
 
 export const updateBuyerVerificationByQuery = async (req: Request, res: Response) => {
     try {
@@ -11,6 +12,9 @@ export const updateBuyerVerificationByQuery = async (req: Request, res: Response
         const buyerVerification = await db.buyer_verification.findUnique({
             where: {
                 id: match.id
+            },
+            include: {
+                buyer: true
             }
         })
 
@@ -20,9 +24,32 @@ export const updateBuyerVerificationByQuery = async (req: Request, res: Response
             })
         }
 
-        if (buyerVerification.status !== 'PENDING') {
+        if (['APPROVED', 'DENIED'].includes(buyerVerification.status)) {
             return res.status(HttpStatusCode.Forbidden).json({
                 message: 'Não é possível atualizar esta validação.'
+            })
+        }
+
+        const payload = {
+            sdkToken: req.body.external_id,
+            personal: {
+                name: buyerVerification?.buyer?.name,
+                cpfNumber: buyerVerification?.buyer?.document,
+            },
+            contacts: {
+                email: [{
+                    emailAddress: buyerVerification?.buyer?.email,
+                    isMain: true
+                }]
+            }
+        }
+
+        if (buyerVerification.external_id) {
+            await IDWALL_API.put(`/profile/${buyerVerification?.buyer?.document}/sdk?runOCR=true`, payload)
+        } else {
+            await IDWALL_API.post(`profile/sdk?runOCR=true`, {
+                ...payload,
+                ref: buyerVerification?.buyer?.document,
             })
         }
 
