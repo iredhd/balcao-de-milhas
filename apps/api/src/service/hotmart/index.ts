@@ -4,6 +4,7 @@ export const HOTMART_API = Axios.create({
     baseURL: `https://developers.hotmart.com/payments/api/v1`
 })
 
+// @ts-ignore
 HOTMART_API.interceptors.request.use(async config => {
     const { data } = await Axios.post(`https://api-sec-vlc.hotmart.com/security/oauth/token`, undefined, {
         headers: {

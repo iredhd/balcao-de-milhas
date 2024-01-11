@@ -36,7 +36,7 @@ export const updateBuyerByQueryController = async (req: Request, res: Response) 
 
         return res.status(HttpStatusCode.Accepted).json({
             token: jwt.sign({
-                id: updatedBuyer.buyer_verification.id,
+                id: updatedBuyer?.buyer_verification?.id,
             }, process.env.VERIFICATION_JWT_TOKEN as string)
         })
     } catch (e) {
