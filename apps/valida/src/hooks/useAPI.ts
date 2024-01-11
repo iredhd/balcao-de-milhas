@@ -4,20 +4,21 @@ import { useMemo } from 'react';
 import { configure } from 'axios-hooks';
 import Axios, { AxiosError } from 'axios' 
 import { enqueueSnackbar } from 'notistack';
+import { AxiosHeaders } from 'axios';
 
 const API = Axios.create({
     baseURL: `${process.env.REACT_APP_API_URL}`
 })
 
-// API.interceptors.request.use((config) => {
-    // const token = window.localStorage.getItem('@milestrack/token')
+API.interceptors.request.use((config) => {
+    const token = window.localStorage.getItem('@balcao-de-milhas/token')
 
-    // if (token) {
-    //     (config.headers as AxiosHeaders).set('Authorization', `Bearer ${token}`)
-    // }
+    if (token) {
+        (config.headers as AxiosHeaders).set('Authorization', `Bearer ${token}`)
+    }
 
-    // return config 
-// })
+    return config 
+})
 
 API.interceptors.response.use(success => success, (error: AxiosError<{ message?: string }>) => {
     if ([403, 409].includes(error.response?.status as number)) {
@@ -26,6 +27,14 @@ API.interceptors.response.use(success => success, (error: AxiosError<{ message?:
         })
         
         return Promise.resolve(error)
+    }
+
+    if (error.response?.status === 401) {
+        window?.localStorage?.removeItem('@balcao-de-milhas/token')
+        
+        if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
+            window.location.href = '/login'
+        }
     }
 
     return Promise.reject(error)

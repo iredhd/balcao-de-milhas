@@ -77,3 +77,12 @@ export const UpdateBuyerValidationSchema = Yup.object({
         }
     }).required(REQUIRED_FIELD),
 })
+
+export const UpdateBuyerVerificationValidationSchema = Yup.object({
+    external_id: Yup.string().required(REQUIRED_FIELD),
+    token: Yup.string().required(REQUIRED_FIELD),
+})
+
+export const SignInSchema = Yup.object({
+    password: Yup.string().required(REQUIRED_FIELD),
+})

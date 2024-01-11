@@ -41,7 +41,7 @@ webhook.post('/milha-news', async (req, res) => {
     })
 
     const chunks = expo.chunkPushNotifications(messages);
-    console.log(JSON.stringify(chunks))
+    
     for (let chunk of chunks) {
       try {
         await expo.sendPushNotificationsAsync(chunk);

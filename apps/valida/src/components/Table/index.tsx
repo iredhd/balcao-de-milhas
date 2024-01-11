@@ -1,7 +1,7 @@
 
 import { css, } from "@emotion/react"
 import styled from "@emotion/styled"
-import { DataGrid, ptBR, DataGridProps } from "@mui/x-data-grid"
+import { DataGrid, ptBR, DataGridProps, GridToolbar } from "@mui/x-data-grid"
 
 const StyledGrid = styled(DataGrid)`
     .MuiDataGrid-virtualScroller {
@@ -15,6 +15,9 @@ export const Table = (props: DataGridProps) => {
             localeText={{
                 ...ptBR.components.MuiDataGrid.defaultProps.localeText,
                 noRowsLabel: 'Não há registros'
+            }}
+            slots={{
+                toolbar: GridToolbar,
             }}
             rowSelection={false}
             {...props}

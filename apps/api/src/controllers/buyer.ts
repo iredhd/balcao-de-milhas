@@ -40,7 +40,6 @@ export const updateBuyerByQueryController = async (req: Request, res: Response) 
             }, process.env.VERIFICATION_JWT_TOKEN as string)
         })
     } catch (e) {
-        console.log(e)
         return res.status(500).json({
             message: INTERNAL_ERROR
         })

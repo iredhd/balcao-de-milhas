@@ -1,16 +1,18 @@
+import { formatCPF, STATUS_OPTIONS } from '@balcao-de-milhas/utils';
 import { SearchOrderValidationSchema, UpdateBuyerValidationSchema } from '@balcao-de-milhas/validations';
 import { useTheme } from '@mui/material';
 import { HttpStatusCode } from 'axios';
 import { useFormik } from 'formik';
 import { enqueueSnackbar } from 'notistack';
-import React, { memo, useEffect } from 'react';
+import React, { Fragment, memo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Grid, Input, Loader, Typography } from '../../components';
-import { useAPI } from '../../hooks';
+import { Alert, Button, Grid, Input, Loader, Typography } from '../../components';
+import { useAPI, useQuery } from '../../hooks';
 
 export function Home() {
     const theme = useTheme()
     const navigate = useNavigate()
+    const query = useQuery()
 
     const [searchedOrder, searchOrder] = useAPI({
         url: '/order/search',
@@ -31,7 +33,6 @@ export function Home() {
             transaction: ''
         },
         validationSchema: SearchOrderValidationSchema,
-        validateOnMount: true,
         onSubmit: values => {
             searchOrder({
                 params: values
@@ -57,23 +58,34 @@ export function Home() {
             })
 
             if (status === HttpStatusCode.Accepted) {
+                navigate(`/validacao?token=${data.token}`)
+
                 enqueueSnackbar('Dados atualizados com sucesso!', {
                     variant: 'success',
-                    autoHideDuration: 1500,
-                    onClose: (reason) => {
-                        navigate(`/validacao?token=${data.token}`)
-                    }
                 })
             }
         }
     })
 
     useEffect(() => {
+        const transaction = query.get('transaction')
+
+        if (transaction) {
+            hpFormik.resetForm({
+                values: {
+                    transaction
+                },
+
+            })
+        }
+    }, [query])
+
+    useEffect(() => {
         if (searchedOrder.data) {
             buyerFormik.resetForm({
                 values: {
                     name: searchedOrder.data.buyer.name,
-                    document: searchedOrder.data.buyer.document,
+                    document: formatCPF(searchedOrder.data.buyer.document || ''),
                     email: searchedOrder.data.buyer.email
                 },
             })
@@ -93,11 +105,11 @@ export function Home() {
             </div>
         )
     }
-
+    
   return (
     <Grid container textAlign="center" height="100vh" justifyContent="center" alignItems="center">
         <Grid item xs={10} sm={8} md={4}>
-            {!searchedOrder.data ? (<form onSubmit={hpFormik.handleSubmit}>
+        {!searchedOrder.data ? (<form onSubmit={hpFormik.handleSubmit}>
                 <Grid container gap={2}>
                 <Grid item xs={12}>
                     <Typography variant='h4' color={theme.palette.primary.main}>
@@ -143,6 +155,7 @@ export function Home() {
                         <Input 
                             label="Nome"
                             name="name"
+                            disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
                             onChange={buyerFormik.handleChange}
                             onBlur={buyerFormik.handleBlur}
                             value={buyerFormik.values.name}
@@ -154,6 +167,7 @@ export function Home() {
                         <Input 
                             label="E-mail"
                             name="email"
+                            disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
                             onChange={buyerFormik.handleChange}
                             onBlur={buyerFormik.handleBlur}
                             value={buyerFormik.values.email}
@@ -165,6 +179,7 @@ export function Home() {
                         <Input 
                             label="CPF"
                             name="document"
+                            disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
                             onChange={(event) => {
                                 buyerFormik.setFieldValue('document', event.target.value.replace(/\D/g, '')
                                 .replace(/(\d{3})(\d)/, '$1.$2')
@@ -178,11 +193,26 @@ export function Home() {
                             error={!!buyerFormik.touched.document && !!buyerFormik.errors.document}
                         />
                     </Grid>
+                    {searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING' ? (<Grid item xs={12} textAlign="left">
+                        <Alert color='info' icon={false}>
+                            <strong>Validação {searchedOrder.data?.buyer.buyer_verification.status === 'COMPLETED' ? ' em andamento' : 'finalizada'}!</strong>
+                            <br /><br />
+                            <strong>Status:</strong> {STATUS_OPTIONS.find(item => item.value === searchedOrder.data?.buyer.buyer_verification.status)?.label}
+                            
+                            {searchedOrder.data?.buyer.buyer_verification.status === 'COMPLETED' && (
+                                <Fragment>
+                                <br /><br />
+                            <span style={{
+                                fontStyle: 'italic'
+                            }}>Você receberá o resultado por e-mail e o status será <strong>APROVADO</strong> ou <strong>RECUSADO</strong>.</span>
+                            </Fragment>)}
+                        </Alert>
+                    </Grid>) : (
                     <Grid item xs={12} >
-                        <Button type='submit' disabled={!buyerFormik.isValid}>
+                        <Button type='submit' disabled={!buyerFormik.isValid || searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}>
                             Confirmar
                         </Button>
-                    </Grid>
+                    </Grid>)}
                 </Grid>
             </form>
             )}
