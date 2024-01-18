@@ -1,18 +1,28 @@
-import { formatCPF, STATUS_OPTIONS } from '@balcao-de-milhas/utils';
+import { formatCPF, STATUS_OPTIONS, formatCEP } from '@balcao-de-milhas/utils';
 import { SearchOrderValidationSchema, UpdateBuyerValidationSchema } from '@balcao-de-milhas/validations';
 import { useTheme } from '@mui/material';
 import { HttpStatusCode } from 'axios';
+import useAxios from 'axios-hooks';
 import { useFormik } from 'formik';
 import { enqueueSnackbar } from 'notistack';
-import React, { Fragment, memo, useEffect } from 'react';
+import React, { Fragment, memo, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Alert, Button, Grid, Input, Loader, Typography } from '../../components';
+import { Alert, Autocomplete, Button, Grid, Input, Loader, PhoneInput, Typography } from '../../components';
 import { useAPI, useQuery } from '../../hooks';
 
 export function Home() {
     const theme = useTheme()
     const navigate = useNavigate()
     const query = useQuery()
+
+    const [countries] = useAxios('https://restcountries.com/v3.1/all')
+
+    const COUNTRY_OPTIONS: {label: string, value: string}[] = useMemo(() => {
+        return (countries.data || []).map((item: { cca2: string, translations: { por: { common: string }}, name: { common: string } }): {value: string, label: string} => ({
+            value: item.cca2,
+            label: item.translations.por.common || item.name.common
+        }))
+    }, [countries.data])
 
     const [searchedOrder, searchOrder] = useAPI({
         url: '/order/search',
@@ -44,7 +54,16 @@ export function Home() {
         initialValues: {
             name: '',
             email: '',
-            document: ''
+            document: '',
+            address_cep: '',
+            address_street: '',
+            address_number: '',
+            address_neighborhood: '',
+            address_complement: '',
+            address_city: '',
+            address_state: '',
+            address_country: 'BR',
+            phone_number: ''
         },
         validationSchema: UpdateBuyerValidationSchema,
         validateOnMount: true,
@@ -84,13 +103,35 @@ export function Home() {
         if (searchedOrder.data) {
             buyerFormik.resetForm({
                 values: {
-                    name: searchedOrder.data.buyer.name,
+                    ...searchedOrder.data.buyer,
                     document: formatCPF(searchedOrder.data.buyer.document || ''),
-                    email: searchedOrder.data.buyer.email
+                    address_cep: formatCEP(searchedOrder.data.buyer.document || ''),
+                    name: searchedOrder.data.buyer.name,
                 },
             })
         }
     }, [searchedOrder])
+
+    const cleanCEP = buyerFormik.values.address_cep.replace(/\D/ig, '')
+    const country = buyerFormik.values.address_country
+
+    const [cepSearch, searchCEP] = useAxios(`https://viacep.com.br/ws/${cleanCEP}/json/`, {
+        manual: true
+    })
+    useEffect(() => {
+        if (cleanCEP.length === 8 && country === 'BR') {
+            searchCEP()
+        }
+    }, [cleanCEP, searchCEP, country])
+
+    useEffect(() => {
+        if (cepSearch.data && !cepSearch.loading && !cepSearch.error) {
+            buyerFormik.setFieldValue('address_street', cepSearch.data.logradouro || '')
+            buyerFormik.setFieldValue('address_city', cepSearch.data.localidade || '')
+            buyerFormik.setFieldValue('address_state', cepSearch.data.uf || '')
+            buyerFormik.setFieldValue('address_neighborhood', cepSearch.data.bairro || '')
+        }
+    }, [cepSearch.data])
 
     if (searchedOrder.loading || updatedBuyer.loading) {
         return (
@@ -108,7 +149,7 @@ export function Home() {
     
   return (
     <Grid container textAlign="center" height="100vh" justifyContent="center" alignItems="center">
-        <Grid item xs={10} sm={8} md={4}>
+        <Grid item xs={10} sm={8} md={4} pt={6} pb={6}>
         {!searchedOrder.data ? (<form onSubmit={hpFormik.handleSubmit}>
                 <Grid container gap={2}>
                 <Grid item xs={12}>
@@ -155,7 +196,7 @@ export function Home() {
                         <Input 
                             label="Nome"
                             name="name"
-                            disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
+                            disabled
                             onChange={buyerFormik.handleChange}
                             onBlur={buyerFormik.handleBlur}
                             value={buyerFormik.values.name}
@@ -167,7 +208,7 @@ export function Home() {
                         <Input 
                             label="E-mail"
                             name="email"
-                            disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
+                            disabled
                             onChange={buyerFormik.handleChange}
                             onBlur={buyerFormik.handleBlur}
                             value={buyerFormik.values.email}
@@ -193,6 +234,152 @@ export function Home() {
                             error={!!buyerFormik.touched.document && !!buyerFormik.errors.document}
                         />
                     </Grid>
+                    <Grid item xs={12}> 
+                        <PhoneInput
+                            label="Telefone do Titular"
+                            inputProps={{
+                                name: 'phone_number'
+                            }}
+                            onChange={value => {
+                                buyerFormik.setFieldValue('phone_number', value, true)
+                            }}
+                            disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
+                            value={buyerFormik.values.phone_number}
+                            onBlur={buyerFormik.handleBlur}
+                            error={!!buyerFormik.touched.phone_number && !!buyerFormik.errors.phone_number}
+                        />
+                    </Grid>
+                    <Grid item xs={12}> 
+                        <Autocomplete
+                            label="País"
+                            disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
+                            onChange={({value}) => {
+                                buyerFormik.resetForm({
+                                    values: {
+                                        ...buyerFormik.values,
+                                        address_cep: '',
+                                        address_city: '',
+                                        address_complement: '',
+                                        address_neighborhood: '',
+                                        address_number: '',
+                                        address_state: '',
+                                        address_street: '',
+                                        address_country: value as string
+                                    },
+                                })
+                            }}
+                            options={COUNTRY_OPTIONS}
+                            onBlur={buyerFormik.handleBlur}
+                            value={COUNTRY_OPTIONS.find(item => item.value === buyerFormik.values.address_country)}
+                            helperText={buyerFormik.touched.address_country && buyerFormik.errors.address_country}
+                            error={!!buyerFormik.touched.address_country && !!buyerFormik.errors.address_country}
+                        />
+                    </Grid>
+                        {buyerFormik.values.address_country && (
+                        <Fragment>
+                            {buyerFormik.values.address_country === 'BR' && (
+                            <Grid item xs={12}> 
+                                <Input 
+                                    label="CEP"
+                                    name="address_cep"
+                                    onChange={(event) => {
+                                        buyerFormik.setFieldValue('address_cep', formatCEP(event.target.value).slice(0, 9))
+                                    }}
+                                    disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
+                                    onBlur={buyerFormik.handleBlur}
+                                    value={buyerFormik.values.address_cep}
+                                    helperText={buyerFormik.touched.address_cep && buyerFormik.errors.address_cep}
+                                    error={!!buyerFormik.touched.address_cep && !!buyerFormik.errors.address_cep}
+                                />
+                            </Grid>)}
+                            <Grid item xs={12}> 
+                                <Input 
+                                    label="Logradouro"
+                                    name="address_street"
+                                    disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
+                                    onChange={buyerFormik.handleChange}
+                                    value={buyerFormik.values.address_street}
+                                    helperText={buyerFormik.touched.address_street && buyerFormik.errors.address_street}
+                                    onBlur={buyerFormik.handleBlur}
+                                    error={!!buyerFormik.touched.address_street && !!buyerFormik.errors.address_street}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Input 
+                                    label="Número"
+                                    name="address_number"
+                                    disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
+                                    onChange={buyerFormik.handleChange}
+                                    value={buyerFormik.values.address_number}
+                                    helperText={buyerFormik.touched.address_number && buyerFormik.errors.address_number}
+                                    onBlur={buyerFormik.handleBlur}
+                                    error={!!buyerFormik.touched.address_number && !!buyerFormik.errors.address_number}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Input 
+                                    label="Complemento"
+                                    name="address_complement"
+                                    disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
+                                    onChange={buyerFormik.handleChange}
+                                    value={buyerFormik.values.address_complement}
+                                    helperText={buyerFormik.touched.address_complement && buyerFormik.errors.address_complement}
+                                    onBlur={buyerFormik.handleBlur}
+                                    error={!!buyerFormik.touched.address_complement && !!buyerFormik.errors.address_complement}
+                                />
+                            </Grid>
+                            {buyerFormik.values.address_country !== 'BR' && (<Grid item xs={12}> 
+                                <Input 
+                                    label="Código Postal"
+                                    name="address_cep"
+                                    disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
+                                    onChange={buyerFormik.handleChange}
+                                    onBlur={buyerFormik.handleBlur}
+                                    value={buyerFormik.values.address_cep}
+                                    helperText={buyerFormik.touched.address_cep && buyerFormik.errors.address_cep}
+                                    error={!!buyerFormik.touched.address_cep && !!buyerFormik.errors.address_cep}
+                                />
+                            </Grid>)}
+                            <Grid item xs={12}>
+                                <Input 
+                                    label="Bairro"
+                                    name="address_neighborhood"
+                                    disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
+                                    onChange={buyerFormik.handleChange}
+                                    value={buyerFormik.values.address_neighborhood}
+                                    helperText={buyerFormik.touched.address_neighborhood && buyerFormik.errors.address_neighborhood}
+                                    onBlur={buyerFormik.handleBlur}
+                                    error={!!buyerFormik.touched.address_neighborhood && !!buyerFormik.errors.address_neighborhood}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Input 
+                                    label="Cidade"
+                                    name="address_city"
+                                    disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
+                                    onChange={buyerFormik.handleChange}
+                                    value={buyerFormik.values.address_city}
+                                    helperText={buyerFormik.touched.address_city && buyerFormik.errors.address_city}
+                                    onBlur={buyerFormik.handleBlur}
+                                    error={!!buyerFormik.touched.address_city && !!buyerFormik.errors.address_city}
+                                />
+                            </Grid>
+                        <Grid item xs={12}>
+                            <Input 
+                                label="Estado"
+                                name="address_state"
+                                disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
+                                onChange={(event) => { 
+                                    buyerFormik.setFieldValue('address_state', event.target.value.replace(/[^a-zA-z]/ig, '').toLocaleUpperCase().substring(0, 2), true)
+                                }}
+                                value={buyerFormik.values.address_state}
+                                helperText={buyerFormik.touched.address_state && buyerFormik.errors.address_state}
+                                onBlur={buyerFormik.handleBlur}
+                                error={!!buyerFormik.touched.address_state && !!buyerFormik.errors.address_state}
+                            />
+                        </Grid>
+                        </Fragment>
+                        )}
                     {searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING' ? (<Grid item xs={12} textAlign="left">
                         <Alert color='info' icon={false}>
                             <strong>Validação {['COMPLETED', 'WAITING_MANUAL_ACTION'].includes(searchedOrder.data?.buyer.buyer_verification.status) ? ' em andamento' : 'finalizada'}!</strong>

@@ -22,9 +22,16 @@ export const updateBuyerByQueryController = async (req: Request, res: Response) 
 
         const updatedBuyer = await db.buyer.update({
             data: {
-                name: req.body.name,
-                email: req.body.email,
-                document: req.body.document.replace(/\D/ig, '')
+                document: req.body.document.replace(/\D/ig, ''),
+                address_cep: req.body.address_cep.replace(/\D/ig, ''),
+                address_city: req.body.address_city,
+                address_complement: req.body.address_complement || null,
+                address_country: req.body.address_country,
+                address_neighborhood: req.body.address_neighborhood,
+                address_number: req.body.address_number,
+                address_state: req.body.address_state,
+                address_street: req.body.address_street,
+                phone_number: req.body.phone_number.replace(/\D/ig, ''),
             },
             where: {
                 id: buyer.id
@@ -37,7 +44,9 @@ export const updateBuyerByQueryController = async (req: Request, res: Response) 
         return res.status(HttpStatusCode.Accepted).json({
             token: jwt.sign({
                 id: updatedBuyer?.buyer_verification?.id,
-            }, process.env.VERIFICATION_JWT_TOKEN as string)
+            }, process.env.VERIFICATION_JWT_TOKEN as string, {
+                expiresIn: '5m'
+            })
         })
     } catch (e) {
         return res.status(500).json({

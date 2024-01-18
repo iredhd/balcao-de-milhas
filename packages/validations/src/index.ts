@@ -76,6 +76,14 @@ export const UpdateBuyerValidationSchema = Yup.object({
             return true; 
         }
     }).required(REQUIRED_FIELD),
+    address_cep: Yup.string().required(REQUIRED_FIELD),
+    address_street: Yup.string().required(REQUIRED_FIELD),
+    address_number: Yup.string().required(REQUIRED_FIELD),
+    address_neighborhood: Yup.string().required(REQUIRED_FIELD),
+    address_complement: Yup.string().optional(),
+    address_city: Yup.string().required(REQUIRED_FIELD),
+    address_state: Yup.string().length(2, 'Deve conter apenas 2 letras').required(REQUIRED_FIELD),
+    address_country: Yup.string().required(REQUIRED_FIELD),
 })
 
 export const UpdateBuyerVerificationValidationSchema = Yup.object({

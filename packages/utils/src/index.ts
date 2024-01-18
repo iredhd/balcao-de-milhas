@@ -71,3 +71,7 @@ export const STATUS_OPTIONS = [
     { value: 'APPROVED', label: getVerificationStatusLabel('APPROVED') },
     { value: 'WAITING_MANUAL_ACTION', label: getVerificationStatusLabel('WAITING_MANUAL_ACTION') },
 ]
+
+export const formatCEP = (value: string) => {
+    return value.replace(/\D/g,'').replace(/(\d{5})(\d{3})/,'$1-$2')
+}

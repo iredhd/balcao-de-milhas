@@ -24,7 +24,7 @@ export const updateBuyerVerificationByQuery = async (req: Request, res: Response
             })
         }
 
-        if (['APPROVED', 'DENIED'].includes(buyerVerification.status)) {
+        if (['APPROVED', 'DENIED', 'WAITING_MANUAL_ACTION'].includes(buyerVerification.status)) {
             return res.status(HttpStatusCode.Forbidden).json({
                 message: 'Não é possível atualizar esta validação.'
             })
@@ -47,7 +47,7 @@ export const updateBuyerVerificationByQuery = async (req: Request, res: Response
         if (buyerVerification.external_id) {
             await IDWALL_API.put(`/profile/${buyerVerification?.buyer?.document}/sdk?runOCR=true`, payload)
         } else {
-            await IDWALL_API.post(`profile/sdk?runOCR=true`, {
+            await IDWALL_API.post(`/profile/sdk?runOCR=true`, {
                 ...payload,
                 ref: buyerVerification?.buyer?.document,
             })

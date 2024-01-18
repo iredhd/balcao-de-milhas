@@ -88,7 +88,16 @@ model buyer {
   document String? @unique()
   external_id String? @unique()
   orders order[]
+  phone_number String?
   buyer_verification buyer_verification?
+  address_cep String?
+  address_street String?
+  address_number String?
+  address_neighborhood String?
+  address_complement String?
+  address_city  String?
+  address_state String?
+  address_country String?
 }
 
 enum buyer_verification_status {
