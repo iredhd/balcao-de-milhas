@@ -11,10 +11,10 @@ export const createDeviceController = async (req: Request, res: Response) => {
             },
             update: {
                 device_info: req.body.device_info,
-                build_id: req.body.build_id,
+                // build_id: req.body.build_id,
             },
             create: {
-                build_id: req.body.build_id,
+                // build_id: req.body.build_id,
                 device_info: req.body.device_info,
                 push_token: req.body.push_token
             }
