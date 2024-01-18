@@ -1,8 +1,11 @@
-import { AxiosError, HttpStatusCode } from 'axios';
+import axios, { HttpStatusCode } from 'axios';
 import { Request, Response } from "express";
 import { db } from "../db";
 import { INTERNAL_ERROR } from "@balcao-de-milhas/validations";
-import { HOTMART_API, IDWALL_API } from "../service";
+import { IDWALL_API } from "../service";
+import {config} from 'dotenv'
+
+config()
 
 export const handleIdWallResponseController = async (req: Request, res: Response) => {
     try {
@@ -11,7 +14,8 @@ export const handleIdWallResponseController = async (req: Request, res: Response
                 document: req.body.profileRef
             },
             include: {
-                buyer_verification: true
+                buyer_verification: true,
+                orders: true
             }
         })
 
@@ -22,14 +26,13 @@ export const handleIdWallResponseController = async (req: Request, res: Response
         }
 
         const { data: { data } } = await IDWALL_API.get(`/profile/${req.body.profileRef}/lastProfileFlow`)
+        const { data: { data: profileData } } = await IDWALL_API.get(`/profile/${req.body.profileRef}`)
 
         if (!['FINISHED', 'INVALID', 'WAITING_MANUAL_ACTION'].includes(data.status)) {
             return res.status(HttpStatusCode.Forbidden).json({
                 message: 'Nada a ser feito.'
             })
         }
-
-        // TODO: ENVIAR O E-MAIL
 
         let status: 'DENIED' | 'APPROVED' | 'WAITING_MANUAL_ACTION' = 'DENIED'
 
@@ -45,6 +48,16 @@ export const handleIdWallResponseController = async (req: Request, res: Response
             },
             data: {
                 status
+            }
+        })
+
+        await axios.post(`https://hook.us1.make.com/nzeweiv1hp4yqbtpjplt1ej1az9za0a8`, {
+            status,
+            idwall_payload: profileData,
+            bdm_payload: buyer
+        }, {
+            headers: {
+                secret: process.env.MAKE_WEBHOOK_SECRET
             }
         })
 

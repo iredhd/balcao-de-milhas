@@ -2,7 +2,7 @@ import { AxiosError, HttpStatusCode } from 'axios';
 import { Request, Response } from "express";
 import { db } from "../db";
 import { INTERNAL_ERROR } from "@balcao-de-milhas/validations";
-import jwt from 'jsonwebtoken'
+import jwt, { TokenExpiredError } from 'jsonwebtoken'
 import { IDWALL_API } from '../service';
 
 export const updateBuyerVerificationByQuery = async (req: Request, res: Response) => {
@@ -30,7 +30,36 @@ export const updateBuyerVerificationByQuery = async (req: Request, res: Response
             })
         }
 
-        const payload = {
+        const payload: {
+            sdkToken: string
+            personal: {
+                name: string
+                cpfNumber: string
+            }
+            contacts: {
+                email: Array<{
+                    emailAddress: string
+                    isMain: boolean
+                }>,
+                phone: Array<{
+                    type: 'mobile'
+                    isMain: boolean
+                    ddd: string
+                    number: string
+                }>
+            }
+            addresses: Array<{
+                type: 'RESIDENTIAL',
+                isMain: boolean,
+                state: string,
+                city: string,
+                neighborhood: string,
+                complement?: string
+                detail: string
+                street: string
+                zipCode: string
+            }>
+        } = {
             sdkToken: req.body.external_id,
             personal: {
                 name: buyerVerification?.buyer?.name,
@@ -40,11 +69,49 @@ export const updateBuyerVerificationByQuery = async (req: Request, res: Response
                 email: [{
                     emailAddress: buyerVerification?.buyer?.email,
                     isMain: true
-                }]
-            }
+                }],
+                phone: []
+            },
+            addresses: []
         }
 
-        if (buyerVerification.external_id) {
+        if (buyerVerification.buyer.phone_number.startsWith('55')) {
+            const ddd = buyerVerification.buyer.phone_number.slice(2, 4)
+            const number = buyerVerification.buyer.phone_number.slice(4)
+
+            payload.contacts.phone.push({
+                type: 'mobile', 
+                isMain: true,
+                ddd,
+                number
+            })
+        }
+
+        if (buyerVerification.buyer.address_country === 'BR') {
+            payload.addresses.push({
+                city: buyerVerification.buyer.address_city,
+                detail: buyerVerification.buyer.address_number,
+                neighborhood: buyerVerification.buyer.address_neighborhood,
+                state: buyerVerification.buyer.address_state,
+                street: buyerVerification.buyer.address_street,
+                zipCode: buyerVerification.buyer.address_cep,
+                complement: buyerVerification.buyer.address_complement || '',
+                type: 'RESIDENTIAL',
+                isMain: true
+            })
+        }
+
+        let profileExists = false
+
+        try {
+            await IDWALL_API.get(`/profile/${buyerVerification?.buyer?.document}`)
+
+            profileExists = true
+        } catch (e) {
+            profileExists = false
+        }
+
+        if (profileExists) {
             await IDWALL_API.put(`/profile/${buyerVerification?.buyer?.document}/sdk?runOCR=true`, payload)
         } else {
             await IDWALL_API.post(`/profile/sdk?runOCR=true`, {
@@ -65,6 +132,12 @@ export const updateBuyerVerificationByQuery = async (req: Request, res: Response
 
         return res.status(HttpStatusCode.NoContent).end()
     } catch (e) {
+        if (e instanceof TokenExpiredError) {
+            return res.status(HttpStatusCode.Forbidden).json({
+                message: 'Token expirado. Por favor, reinicie a validação.'
+            })
+        }
+
         return res.status(HttpStatusCode.InternalServerError).json({
             message: INTERNAL_ERROR
         })

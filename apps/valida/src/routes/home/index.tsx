@@ -105,7 +105,8 @@ export function Home() {
                 values: {
                     ...searchedOrder.data.buyer,
                     document: formatCPF(searchedOrder.data.buyer.document || ''),
-                    address_cep: formatCEP(searchedOrder.data.buyer.document || ''),
+                    address_cep: formatCEP(searchedOrder.data.buyer.address_cep || ''),
+                    address_complement: searchedOrder.data.buyer.address_complement || '',
                     name: searchedOrder.data.buyer.name,
                 },
             })
