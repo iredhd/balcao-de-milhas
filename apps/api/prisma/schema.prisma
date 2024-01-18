@@ -62,6 +62,8 @@ model log {
   headers Json 
   body Json
   method log_method
+  response Json?
+  status Int?
 }
 
 model device {

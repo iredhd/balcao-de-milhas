@@ -12,9 +12,26 @@ export const logMiddleware = async (req: Request, res: Response, next: NextFunct
           method: req.method as 'POST',
         } 
 
-        await db.log.create({
+        const log = await db.log.create({
           data: payload
         })
+
+        const oldJSON = res.json;
+        
+        // @ts-ignore
+        res.json = async (data) => {
+          await db.log.update({
+            where: {
+              id: log.id
+            },
+            data: {
+              response: data || null,
+              status: res.statusCode
+            }
+          })
+
+          return oldJSON.call(res, data)
+        }
   
       return next();
     } catch (err) {
