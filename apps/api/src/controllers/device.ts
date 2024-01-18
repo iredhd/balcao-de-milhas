@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { db } from "../db";
 import { INTERNAL_ERROR } from "@balcao-de-milhas/validations";
+import morgan from "morgan";
 
 export const createDeviceController = async (req: Request, res: Response) => {
     try {
@@ -21,6 +22,7 @@ export const createDeviceController = async (req: Request, res: Response) => {
 
         return res.status(201).json()
     } catch (e) {
+        console.log(e, (e as Error)?.message)
         return res.status(500).json({
             message: INTERNAL_ERROR
         })
