@@ -25,7 +25,7 @@ export const logMiddleware = async (req: Request, res: Response, next: NextFunct
               id: log.id
             },
             data: {
-              response: data || null,
+              response: data || undefined,
               status: res.statusCode
             }
           })
@@ -35,6 +35,6 @@ export const logMiddleware = async (req: Request, res: Response, next: NextFunct
   
       return next();
     } catch (err) {
-      return res.status(500).end()
+      return res.status(500).json()
     }
   }

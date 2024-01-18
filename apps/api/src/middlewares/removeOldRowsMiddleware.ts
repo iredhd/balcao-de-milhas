@@ -22,6 +22,6 @@ export const removeOldRowsMiddleware = async (req: Request, res: Response, next:
 
     return next();
     } catch (err) {
-      return res.status(500).end()
+      return res.status(500).json()
     }
   }

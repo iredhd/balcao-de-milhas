@@ -51,7 +51,7 @@ webhook.post('/milha-news', async (req, res) => {
     }
   }
 
-  return res.status(201).end()
+  return res.status(201).json()
 })
 
 webhook.post('/bid', async (req, res) => {
@@ -96,7 +96,7 @@ webhook.post('/bid', async (req, res) => {
       }
     })
 
-    return res.status(201).end()
+    return res.status(201).json()
   } catch (e) {
     return res.status(500).json({
       message: (e as Error)?.message
@@ -126,7 +126,7 @@ webhook.delete('/bid/:offer_id', async (req, res) => {
       }
     })
 
-    return res.status(204).end()
+    return res.status(204).json()
   } catch (e) {
     return res.status(500).json({
       message: (e as Error)?.message
@@ -135,5 +135,5 @@ webhook.delete('/bid/:offer_id', async (req, res) => {
 })
 
 webhook.post('/bdm', async (req, res) => {
-  return res.status(201).end()
+  return res.status(201).json()
 })

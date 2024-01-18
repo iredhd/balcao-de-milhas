@@ -19,7 +19,7 @@ export const createDeviceController = async (req: Request, res: Response) => {
             }
         })
 
-        return res.status(201).end()
+        return res.status(201).json()
     } catch (e) {
         return res.status(500).json({
             message: INTERNAL_ERROR

@@ -152,7 +152,7 @@ export const updateBuyerVerificationByQuery = async (req: Request, res: Response
             }
         })
 
-        return res.status(HttpStatusCode.NoContent).end()
+        return res.status(HttpStatusCode.NoContent).json()
     } catch (e) {
         if (e instanceof TokenExpiredError) {
             return res.status(HttpStatusCode.Forbidden).json({
