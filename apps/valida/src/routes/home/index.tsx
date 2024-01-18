@@ -86,9 +86,9 @@ export function Home() {
         }
     })
 
-    useEffect(() => {
-        const transaction = query.get('transaction')
+    const transaction = query.get('transaction')
 
+    useEffect(() => {
         if (transaction) {
             hpFormik.resetForm({
                 values: {
@@ -97,7 +97,7 @@ export function Home() {
 
             })
         }
-    }, [query])
+    }, [transaction])
 
     useEffect(() => {
         if (searchedOrder.data) {
@@ -167,6 +167,7 @@ export function Home() {
                     <Input 
                         label="HP"
                         name="transaction"
+                        disabled={!!transaction}
                         onChange={hpFormik.handleChange}
                         onBlur={hpFormik.handleBlur}
                         value={hpFormik.values.transaction}
