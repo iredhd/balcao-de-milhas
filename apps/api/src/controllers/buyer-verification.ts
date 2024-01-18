@@ -18,7 +18,7 @@ export const updateBuyerVerificationByQuery = async (req: Request, res: Response
             }
         })
 
-        if (!buyerVerification) {
+        if (!buyerVerification || !buyerVerification?.buyer) {
             return res.status(HttpStatusCode.Forbidden).json({
                 message: 'Token inválido.'
             })
@@ -27,6 +27,15 @@ export const updateBuyerVerificationByQuery = async (req: Request, res: Response
         if (['APPROVED', 'DENIED', 'WAITING_MANUAL_ACTION'].includes(buyerVerification.status)) {
             return res.status(HttpStatusCode.Forbidden).json({
                 message: 'Não é possível atualizar esta validação.'
+            })
+        }
+
+        if (
+            !buyerVerification?.buyer?.document
+            || !buyerVerification.buyer.phone_number
+        ) {
+            return res.status(HttpStatusCode.Forbidden).json({
+                message: 'Dados inválidos.'
             })
         }
 
@@ -88,6 +97,19 @@ export const updateBuyerVerificationByQuery = async (req: Request, res: Response
         }
 
         if (buyerVerification.buyer.address_country === 'BR') {
+            if (
+                !buyerVerification.buyer.address_city
+                || !buyerVerification.buyer.address_number
+                || !buyerVerification.buyer.address_neighborhood
+                || !buyerVerification.buyer.address_state
+                || !buyerVerification.buyer.address_street
+                || !buyerVerification.buyer.address_cep
+            ) {
+                return res.status(HttpStatusCode.Forbidden).json({
+                    message: 'Dados de endereço inválidos.'
+                }) 
+            }
+
             payload.addresses.push({
                 city: buyerVerification.buyer.address_city,
                 detail: buyerVerification.buyer.address_number,
