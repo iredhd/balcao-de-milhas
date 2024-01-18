@@ -3,7 +3,7 @@ import {auth, bid, buyer, buyerVerification, device, news, order, webhook} from 
 import cors from 'cors'
 import morgan from 'morgan'
 import { config } from 'dotenv'
-import { logMiddleware, removeOldRowsMiddleware, webhookAuthMiddleware } from './middlewares'
+import { logMiddleware, removeOldRowsMiddleware, webhookAuthMiddleware, webhookIdwallMiddleware } from './middlewares'
 import { handleIdWallResponseController } from './controllers'
 
 const app = express()
@@ -25,7 +25,7 @@ app.get('/', (_, res) => {
 
 app.use('/bid', bid)
 app.use('/news', news)
-app.post('/webhook/idwall', handleIdWallResponseController)
+app.post('/webhook/idwall', webhookIdwallMiddleware, handleIdWallResponseController)
 app.use('/webhook', webhookAuthMiddleware, webhook)
 app.use('/device', device)
 app.use('/order', order)
