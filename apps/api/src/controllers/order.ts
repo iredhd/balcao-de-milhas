@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { db } from "../db";
 import { INTERNAL_ERROR } from "@balcao-de-milhas/validations";
 import { HOTMART_API } from "../service";
+import moment from 'moment';
 
 export const searchOrderController = async (req: Request, res: Response) => {
     try {
@@ -21,6 +22,18 @@ export const searchOrderController = async (req: Request, res: Response) => {
                 message: 'Pedido não encontrado.'
             })
         }
+
+        const date = new Date(hotmartOrder.purchase.approved_date)
+        
+        const diff = moment().diff(date, 'days')
+
+        if (diff < 7) {
+            return res.status(HttpStatusCode.Forbidden).json({
+                message: 'Este pedido ainda não tem 7 dias.'
+            })
+        }
+
+        console.log('hotmartOrder', hotmartOrder, date)
 
         const order = await db.order.upsert({
             where: {

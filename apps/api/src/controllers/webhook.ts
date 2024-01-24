@@ -53,8 +53,9 @@ export const handleIdWallResponseController = async (req: Request, res: Response
 
         await axios.post(`https://hook.us1.make.com/nzeweiv1hp4yqbtpjplt1ej1az9za0a8`, {
             status,
+            secret: process.env.MAKE_WEBHOOK_SECRET,
             idwall_payload: profileData,
-            bdm_payload: buyer
+            bdm_payload: buyer,
         }, {
             headers: {
                 secret: process.env.MAKE_WEBHOOK_SECRET
