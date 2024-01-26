@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(logMiddleware)
 app.use(removeOldRowsMiddleware)
 
-app.get('/', (_, res) => {
+app.all('/', (_, res) => {
   return res.status(200).json({
     status: 'BDM: alive'
   }) 
