@@ -1,0 +1,9 @@
+-- CreateTable
+CREATE TABLE `flight` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `text` LONGTEXT NOT NULL,
+    `file` VARCHAR(191) NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

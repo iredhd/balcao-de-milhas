@@ -33,8 +33,6 @@ export const searchOrderController = async (req: Request, res: Response) => {
             })
         }
 
-        console.log('hotmartOrder', hotmartOrder, date)
-
         const order = await db.order.upsert({
             where: {
                 transaction

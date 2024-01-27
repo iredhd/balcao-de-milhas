@@ -3,8 +3,9 @@ import {auth, bid, buyer, buyerVerification, device, news, order, webhook} from 
 import cors from 'cors'
 import morgan from 'morgan'
 import { config } from 'dotenv'
-import { logMiddleware, removeOldRowsMiddleware, webhookAuthMiddleware, webhookIdwallMiddleware } from './middlewares'
+import { logMiddleware, removeOldRowsMiddleware, webhookAuthMiddleware, webhookFlightsAppAuthMiddleware, webhookIdwallMiddleware } from './middlewares'
 import { handleIdWallResponseController } from './controllers'
+import { flights } from './routes/flights'
 
 const app = express()
 
@@ -32,5 +33,6 @@ app.use('/order', order)
 app.use('/buyer', buyer)
 app.use('/buyer-verification', buyerVerification)
 app.use('/auth', auth)
+app.use('/flights', webhookFlightsAppAuthMiddleware, flights)
 
 app.listen(process.env.API_PORT, () => console.log(`Server running on port ${process.env.API_PORT}`))

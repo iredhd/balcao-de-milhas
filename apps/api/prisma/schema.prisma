@@ -74,6 +74,27 @@ model device {
   push_token String? @unique
 }
 
+model flights_app_device {
+  id Int @id @default(autoincrement())
+  created_at DateTime @default(now())
+  device_info Json 
+  brand String
+  model String 
+  os String
+  push_token String? @unique
+  device_id String @unique
+  active Boolean @default(true)
+  last_ip String
+  last_use_at DateTime @default(now())
+}
+
+model flight { 
+  id Int @id @default(autoincrement())
+  created_at DateTime @default(now())
+  text String @db.LongText
+  file String?
+}
+
 model order {
   id Int @id @default(autoincrement())
   created_at DateTime @default(now())

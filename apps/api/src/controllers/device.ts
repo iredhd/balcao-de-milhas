@@ -22,7 +22,37 @@ export const createDeviceController = async (req: Request, res: Response) => {
 
         return res.status(201).json()
     } catch (e) {
-        console.log(e, (e as Error)?.message)
+        return res.status(500).json({
+            message: INTERNAL_ERROR
+        })
+    }
+}
+
+export const createFlightsAppDeviceController = async (req: Request, res: Response) => {
+    try {
+        await db.flights_app_device.upsert({
+            where: {
+                device_id: req.body.device_id
+            },
+            update: {
+                last_ip: req.ip || req.socket.remoteAddress || '',
+                last_use_at: new Date(),
+            },
+            create: {
+                push_token: req.body.push_token,
+                active: true,
+                last_ip: req.ip || req.socket.remoteAddress || '',
+                last_use_at: new Date(),
+                brand: req.body.device_info.brand,
+                device_id: req.body.device_id,
+                device_info: req.body.device_info,
+                model: req.body.device_info.modelName,
+                os: req.body.device_info.osName
+            }
+        })
+
+        return res.status(201).json()
+    } catch (e) {
         return res.status(500).json({
             message: INTERNAL_ERROR
         })

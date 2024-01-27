@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { db } from '../db'
 import { Expo } from 'expo-server-sdk';
+import { handleCheapFlightsWebhookController } from '../controllers';
 
 export const webhook = Router()
 
@@ -133,6 +134,9 @@ webhook.delete('/bid/:offer_id', async (req, res) => {
     })
   }
 })
+
+webhook.post('/flight', handleCheapFlightsWebhookController)
+
 
 webhook.post('/bdm', async (req, res) => {
   return res.status(201).json()

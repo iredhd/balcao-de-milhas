@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "Voos Baratos",
+    "slug": "voos-baratos",
+    "version": "1.0.1",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "voos-baratos",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "buildNumber": "1",
+      "supportsTablet": false,
+      "bundleIdentifier": "com.sdpj.voosbaratos",
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": [
+          "tg"
+        ]
+      }
+    },
+    "android": {
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.sdpj.voosbaratos"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "d8a5cd6d-1ecf-48b7-a39a-2a046fe1ebbc"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    }
+  }
+}
