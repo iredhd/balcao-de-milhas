@@ -74,6 +74,48 @@ export const handleIdWallResponseController = async (req: Request, res: Response
     }
 }
 
+export const handleRestartVerificationController = async (req: Request, res: Response) => {
+    try {
+        const transaction = req.params.transaction
+
+        const order = await db.order.findUnique({
+            where: {
+                transaction
+            },
+            include: {
+                buyer: {
+                    include: {
+                        buyer_verification: true
+                    }
+                }
+            }
+        })
+
+        if (!order) {
+            return res.status(HttpStatusCode.Forbidden).json({
+                message: 'Transação não encontrada.'
+            })
+        }
+
+
+        await db.buyer_verification.update({
+            where: {
+                buyer_id: order.buyer_id
+            },
+            data: {
+                status: 'PENDING',
+                external_id: ''
+            }
+        })
+
+        return res.status(201).json()
+    } catch (e) {
+        return res.status(500).json({
+            message: INTERNAL_ERROR
+        })
+    }
+}
+
 export const handleCheapFlightsWebhookController = async (req: Request, res: Response) => {
     try {
         let file_path: string

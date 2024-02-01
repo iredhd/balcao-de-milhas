@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { db } from '../db'
 import { Expo } from 'expo-server-sdk';
-import { handleCheapFlightsWebhookController } from '../controllers';
+import { handleCheapFlightsWebhookController, handleRestartVerificationController } from '../controllers';
 
 export const webhook = Router()
 
@@ -141,3 +141,5 @@ webhook.post('/flight', handleCheapFlightsWebhookController)
 webhook.post('/bdm', async (req, res) => {
   return res.status(201).json()
 })
+
+webhook.post('/bdm/reset-verification/:transaction', handleRestartVerificationController)
