@@ -8,15 +8,31 @@ import fs from 'fs'
 import http from 'http'
 import os from 'os'
 import { v4 as uuidv4 } from 'uuid';
+import { Prisma } from '@prisma/client';
 
 config()
 
 export const handleIdWallResponseController = async (req: Request, res: Response) => {
     try {
+        let where: Prisma.buyerWhereInput = {}
+        
+        if (req.body.profileRef) {
+            where.document = req.body.profileRef
+        }
+
+        if (req.body.transaction) {
+            where = {
+                ...where,
+                orders: {
+                    some: {
+                        transaction: req.body.transaction
+                    }
+                }
+            }
+        }
+
         const buyer = await db.buyer.findFirst({
-            where: {
-                document: req.body.profileRef
-            },
+            where,
             include: {
                 buyer_verification: true,
                 orders: true
