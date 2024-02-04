@@ -45,8 +45,14 @@ export const handleIdWallResponseController = async (req: Request, res: Response
             })
         }
 
-        const { data: { data } } = await IDWALL_API.get(`/profile/${req.body.profileRef}/lastProfileFlow`)
-        const { data: { data: profileData } } = await IDWALL_API.get(`/profile/${req.body.profileRef}`)
+        if (buyer.buyer_verification.status === 'PENDING') {
+            return res.status(HttpStatusCode.Forbidden).json({
+                message: 'Usuário não iniciou a validação.'
+            })
+        }
+
+        const { data: { data } } = await IDWALL_API.get(`/profile/${buyer.document}/lastProfileFlow`)
+        const { data: { data: profileData } } = await IDWALL_API.get(`/profile/${buyer.document}`)
 
         if (!['FINISHED', 'INVALID', 'WAITING_MANUAL_ACTION'].includes(data.status)) {
             return res.status(HttpStatusCode.Forbidden).json({
