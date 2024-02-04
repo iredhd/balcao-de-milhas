@@ -84,6 +84,7 @@ export const handleIdWallResponseController = async (req: Request, res: Response
 
         return res.status(HttpStatusCode.Accepted).json()
     } catch (e) {
+        console.log(e)
         return res.status(500).json({
             message: INTERNAL_ERROR
         })
