@@ -199,6 +199,7 @@ export function Home() {
                             label="Nome"
                             name="name"
                             disabled
+                            required
                             onChange={buyerFormik.handleChange}
                             onBlur={buyerFormik.handleBlur}
                             value={buyerFormik.values.name}
@@ -211,6 +212,7 @@ export function Home() {
                             label="E-mail"
                             name="email"
                             disabled
+                            required
                             onChange={buyerFormik.handleChange}
                             onBlur={buyerFormik.handleBlur}
                             value={buyerFormik.values.email}
@@ -222,6 +224,7 @@ export function Home() {
                         <Input 
                             label="CPF"
                             name="document"
+                            required
                             disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
                             onChange={(event) => {
                                 buyerFormik.setFieldValue('document', event.target.value.replace(/\D/g, '')
@@ -238,7 +241,7 @@ export function Home() {
                     </Grid>
                     <Grid item xs={12}> 
                         <PhoneInput
-                            label="Telefone do Titular"
+                            label="Telefone do Titular *"
                             inputProps={{
                                 name: 'phone_number'
                             }}
@@ -253,7 +256,8 @@ export function Home() {
                     </Grid>
                     <Grid item xs={12}> 
                         <Autocomplete
-                            label="País"
+                            label="País *"
+                            required
                             disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
                             onChange={({value}) => {
                                 buyerFormik.resetForm({
@@ -283,6 +287,7 @@ export function Home() {
                             <Grid item xs={12}> 
                                 <Input 
                                     label="CEP"
+                                    required
                                     name="address_cep"
                                     onChange={(event) => {
                                         buyerFormik.setFieldValue('address_cep', formatCEP(event.target.value).slice(0, 9))
@@ -298,6 +303,7 @@ export function Home() {
                                 <Input 
                                     label="Logradouro"
                                     name="address_street"
+                                    required
                                     disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
                                     onChange={buyerFormik.handleChange}
                                     value={buyerFormik.values.address_street}
@@ -310,6 +316,7 @@ export function Home() {
                                 <Input 
                                     label="Número"
                                     name="address_number"
+                                    required
                                     disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
                                     onChange={buyerFormik.handleChange}
                                     value={buyerFormik.values.address_number}
@@ -334,6 +341,7 @@ export function Home() {
                                 <Input 
                                     label="Código Postal"
                                     name="address_cep"
+                                    required
                                     disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
                                     onChange={buyerFormik.handleChange}
                                     onBlur={buyerFormik.handleBlur}
@@ -346,6 +354,7 @@ export function Home() {
                                 <Input 
                                     label="Bairro"
                                     name="address_neighborhood"
+                                    required
                                     disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
                                     onChange={buyerFormik.handleChange}
                                     value={buyerFormik.values.address_neighborhood}
@@ -358,6 +367,7 @@ export function Home() {
                                 <Input 
                                     label="Cidade"
                                     name="address_city"
+                                    required
                                     disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
                                     onChange={buyerFormik.handleChange}
                                     value={buyerFormik.values.address_city}
@@ -369,6 +379,7 @@ export function Home() {
                         <Grid item xs={12}>
                             <Input 
                                 label="Estado"
+                                required
                                 name="address_state"
                                 disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}
                                 onChange={(event) => { 
@@ -398,7 +409,7 @@ export function Home() {
                         </Alert>
                     </Grid>) : (
                     <Grid item xs={12} >
-                        <Button type='submit' disabled={!buyerFormik.isValid || searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}>
+                        <Button type='submit' disabled={searchedOrder.data?.buyer.buyer_verification.status !== 'PENDING'}>
                             Confirmar
                         </Button>
                     </Grid>)}
