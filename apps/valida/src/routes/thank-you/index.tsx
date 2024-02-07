@@ -22,7 +22,7 @@ export function ThankYou() {
                 </Grid>
                 <Grid item xs={12}>
                     <Typography variant='body1' color={theme.palette.primary.main}>
-                        Seus dados serão analisados e você receberá o resultado por e-mail.
+                        Seus dados serão analisados e você receberá o resultado em breve.
                     </Typography>
                 </Grid>
             </Grid>

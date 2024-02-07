@@ -17,7 +17,9 @@ export const SearchOrderValidationSchema = Yup.object({
             const hasHP = value?.trim().startsWith('HP')
 
             if (!hasHP) {
-                return false
+                const isNumeric = Number(value)
+                
+                return !Number.isNaN(isNumeric)
             }
 
             const hasNumbers = value?.trim().replace(/\D/ig, '')

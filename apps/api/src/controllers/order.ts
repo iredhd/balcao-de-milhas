@@ -2,7 +2,7 @@ import { AxiosError, HttpStatusCode } from 'axios';
 import { Request, Response } from "express";
 import { db } from "../db";
 import { INTERNAL_ERROR } from "@balcao-de-milhas/validations";
-import { HOTMART_API } from "../service";
+import { HOTMART_API, EDUZZ_API } from "../service";
 import moment from 'moment';
 
 export const searchOrderController = async (req: Request, res: Response) => {
@@ -17,13 +17,48 @@ export const searchOrderController = async (req: Request, res: Response) => {
 
         const hotmartOrder = data.items[0]
 
+        let externalOrder: {
+            buyer: {
+                external_id: string
+                email: string
+                name: string
+            },
+            date: Date
+        } | undefined
+
         if (!hotmartOrder) {
-            return res.status(HttpStatusCode.Forbidden).json({
-                message: 'Pedido não encontrado.'
-            })
+            const eduzzResponse = await EDUZZ_API.get(`/sale/get_sale/${req.query.transaction}`)
+            
+            const eduzzOrder = eduzzResponse.data.data[0]
+
+            if (eduzzOrder) {
+                externalOrder = {
+                    ...externalOrder,
+                    buyer: {
+                        email: eduzzOrder.client_email,
+                        name: eduzzOrder.client_name,
+                        external_id: String(eduzzOrder.client_id),
+                    },
+                    date: new Date(eduzzOrder.date_create)
+                }
+            } else {
+                return res.status(HttpStatusCode.Forbidden).json({
+                    message: 'Pedido não encontrado.'
+                })
+            }
+        } else {
+            externalOrder = {
+                ...externalOrder,
+                buyer: {
+                    email: hotmartOrder.buyer.email,
+                    name: hotmartOrder.buyer.name,
+                    external_id: hotmartOrder.buyer.ucode,
+                },
+                date: new Date(hotmartOrder.purchase.approved_date)
+            }
         }
 
-        const date = new Date(hotmartOrder.purchase.approved_date)
+        const date = new Date(externalOrder.date)
         
         const diff = moment().diff(date, 'days')
 
@@ -42,12 +77,12 @@ export const searchOrderController = async (req: Request, res: Response) => {
                 buyer: {
                     connectOrCreate: {
                         where: {
-                            external_id: hotmartOrder.buyer.ucode
+                            external_id: externalOrder.buyer.external_id
                         },
                         create: {
-                            email: hotmartOrder.buyer.email,
-                            name: hotmartOrder.buyer.name,
-                            external_id: hotmartOrder.buyer.ucode,
+                            email: externalOrder.buyer.email,
+                            name: externalOrder.buyer.name,
+                            external_id: externalOrder.buyer.external_id,
                             buyer_verification: {
                                 create: {
                                     status: 'PENDING',
