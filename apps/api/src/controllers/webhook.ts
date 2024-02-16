@@ -182,7 +182,7 @@ export const handleCheapFlightsWebhookController = async (req: Request, res: Res
 
         await db.flight.create({
             data: {
-                text: decodeURI(decodeURI(req.body.text)),
+                text: decodeURIComponent(decodeURI(req.body.text)),
                 file: path ? String(path) : null
             }
         })

@@ -166,7 +166,7 @@ const FlightCard = ({text, created_at, id}: Flight) => {
                 paddingTop: 15
             }}>
                 <Text style={{fontStyle: 'italic', marginBottom: 15 }}>{formatDateTime(created_at)}</Text>
-                <Text style={{fontWeight: 'bold' }}>{text}</Text>
+                <Text style={{fontWeight: 'bold' }}>{decodeURIComponent(text)}</Text>
             </Card.Content>
         </Card>
         </Fragment>
