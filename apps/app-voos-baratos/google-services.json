@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "695999938510",
+    "project_id": "voos-baratos-e78c2",
+    "storage_bucket": "voos-baratos-e78c2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:695999938510:android:79469b5eda8838962d759f",
+        "android_client_info": {
+          "package_name": "android.package"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDm08dwLDzWz-zufkw2TqqCACjMU3l1p04"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:695999938510:android:e3e69e70a457a6912d759f",
+        "android_client_info": {
+          "package_name": "com.sdpj.voosbaratos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDm08dwLDzWz-zufkw2TqqCACjMU3l1p04"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
