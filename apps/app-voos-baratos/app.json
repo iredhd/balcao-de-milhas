@@ -31,7 +31,8 @@
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.sdpj.voosbaratos"
+      "package": "com.sdpj.voosbaratos",
+      "googleServicesFile": "./google-services.json"
     },
     "plugins": [
       "expo-router"
