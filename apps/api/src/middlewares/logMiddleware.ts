@@ -1,9 +1,16 @@
 import { Prisma } from "@prisma/client";
 import { NextFunction, Request, Response } from "express"
+import moment from "moment";
 import { db } from "../db";
 
 export const logMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        await db.log.deleteMany({
+          where: {
+            created_at: { lte: moment().subtract(7, 'days').toDate() }
+          }
+        })
+
         const payload: Prisma.logCreateInput = {
           url: req.url,
           body: req.body,
